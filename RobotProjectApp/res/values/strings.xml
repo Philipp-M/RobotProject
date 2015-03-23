@@ -2,9 +2,10 @@
 <resources>
 
     <string name="app_name">RobotProjectApp</string>
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section3">Section 3</string>
+    <string name="title_section1">Robot WASD</string>
+    <string name="title_section2">Quarter Drive</string>
+    <string name="title_section3">Odometry</string>
+    <string name="title_section4">Next Topic</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
