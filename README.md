@@ -1,0 +1,3 @@
+Roboter Project for the Course 'Introduction to Autonomous and Intelligent Systems'
+==============
+The App is in the RobotProjectApp directory...
