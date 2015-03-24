@@ -19,6 +19,7 @@ public class RobotWASDFragment extends Fragment {
 	 * Returns a new instance of this fragment for the given section number.
 	 */
 	private TextView textLog;
+
 	public static RobotWASDFragment newInstance(int sectionNumber) {
 		RobotWASDFragment fragment = new RobotWASDFragment();
 		Bundle args = new Bundle();
@@ -28,25 +29,80 @@ public class RobotWASDFragment extends Fragment {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		View rootView = inflater.inflate(R.layout.fragment_robot_wasd,
-				container, false);
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		View rootView = inflater.inflate(R.layout.fragment_robot_wasd, container, false);
 		textLog = (TextView) rootView.findViewById(R.id.robot_wasd_textLog);
 		// set all the button onClick methods
-		
+
 		((Button) rootView.findViewById(R.id.robot_wasd_buttonW)).setOnClickListener(new OnClickListener() {
-	          public void onClick(View v) {
-	        	  buttonW_onClick(v);
-	          }
-	       });
+			public void onClick(View v) {
+				buttonW_onClick(v);
+			}
+		});
+		((Button) rootView.findViewById(R.id.robot_wasd_buttonA)).setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				buttonA_onClick(v);
+			}
+		});
+		((Button) rootView.findViewById(R.id.robot_wasd_buttonS)).setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				buttonS_onClick(v);
+			}
+		});
+		((Button) rootView.findViewById(R.id.robot_wasd_buttonD)).setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				buttonD_onClick(v);
+			}
+		});
+		((Button) rootView.findViewById(R.id.robot_wasd_buttonX)).setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				buttonX_onClick(v);
+			}
+		});
+		((Button) rootView.findViewById(R.id.robot_wasd_buttonUp)).setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				buttonUp_onClick(v);
+			}
+		});
+		((Button) rootView.findViewById(R.id.robot_wasd_buttonDown)).setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				buttonDown_onClick(v);
+			}
+		});
+		((Button) rootView.findViewById(R.id.robot_wasd_buttonPlus)).setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				buttonPlus_onClick(v);
+			}
+		});
+		((Button) rootView.findViewById(R.id.robot_wasd_buttonMinus)).setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				buttonMinus_onClick(v);
+			}
+		});
+		((Button) rootView.findViewById(R.id.robot_wasd_buttonLedOn)).setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				buttonLedOn_onClick(v);
+			}
+		});
+		((Button) rootView.findViewById(R.id.robot_wasd_buttonLedOff)).setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				buttonLedOff_onClick(v);
+			}
+		});
+		((Button) rootView.findViewById(R.id.robot_wasd_buttonSensor)).setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				buttonSensor_onClick(v);
+			}
+		});
 		return rootView;
 	}
+
 	public void logText(String text) {
 		if (text.length() > 0) {
 			textLog.append("[" + text.length() + "] " + text + "\n");
 		}
-	}	
+	}
+
 	// move forward
 	public void buttonW_onClick(View v) {
 		logText("pressed forward");
@@ -104,14 +160,14 @@ public class RobotWASDFragment extends Fragment {
 	}
 
 	public void buttonSensor_onClick(View v) {
-//		ArrayList<Byte> sensorData = comReadBinWrite(new byte[] { 'p', '\r',
-//				'\b' });
-//		logText("s0: " + (int) sensorData.get(0) + " s1: "
-//				+ (int) sensorData.get(1) + " s2: " + (int) sensorData.get(2)
-//				+ " s3: " + (int) (0xFF & sensorData.get(3)) + " s4: "
-//				+ (int) sensorData.get(4) + " s5: " + (int) sensorData.get(5)
-//				+ " s6: " + (int) sensorData.get(6) + " s7: "
-//				+ (int) sensorData.get(7) + "\n");
+		// ArrayList<Byte> sensorData = comReadBinWrite(new byte[] { 'p', '\r',
+		// '\b' });
+		// logText("s0: " + (int) sensorData.get(0) + " s1: "
+		// + (int) sensorData.get(1) + " s2: " + (int) sensorData.get(2)
+		// + " s3: " + (int) (0xFF & sensorData.get(3)) + " s4: "
+		// + (int) sensorData.get(4) + " s5: " + (int) sensorData.get(5)
+		// + " s6: " + (int) sensorData.get(6) + " s7: "
+		// + (int) sensorData.get(7) + "\n");
 
 	}
 }

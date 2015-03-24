@@ -58,7 +58,7 @@
             android:text="W" />
 
         <Button
-            android:id="@+id/ButtonDown"
+            android:id="@+id/robot_wasd_buttonDown"
             android:layout_width="80dp"
             android:layout_height="60dp"
             android:layout_column="0"
@@ -67,7 +67,7 @@
             android:text="Down" />
 
         <Button
-            android:id="@+id/ButtonUp"
+            android:id="@+id/robot_wasd_buttonUp"
             android:layout_width="80dp"
             android:layout_height="60dp"
             android:layout_column="0"
@@ -76,7 +76,7 @@
             android:text="Up" />
 
         <Button
-            android:id="@+id/ButtonMinus"
+            android:id="@+id/robot_wasd_buttonMinus"
             android:layout_width="80dp"
             android:layout_height="60dp"
             android:layout_column="0"
@@ -85,7 +85,7 @@
             android:text="-" />
 
         <Button
-            android:id="@+id/ButtonPlus"
+            android:id="@+id/robot_wasd_buttonPlus"
             android:layout_width="80dp"
             android:layout_height="60dp"
             android:layout_column="0"
