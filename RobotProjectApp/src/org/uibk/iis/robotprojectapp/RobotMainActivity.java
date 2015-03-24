@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class RobotMainActivity extends ActionBarActivity implements
 		ActionBar.TabListener {
@@ -34,6 +35,8 @@ public class RobotMainActivity extends ActionBarActivity implements
 	 * The {@link ViewPager} that will host the section contents.
 	 */
 	ViewPager mViewPager;
+	
+	ComDriver comDevice;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +66,12 @@ public class RobotMainActivity extends ActionBarActivity implements
 						actionBar.setSelectedNavigationItem(position);
 					}
 				});
-
+		// Setup the Com device (Robot)
+		
+		comDevice = new ComDriver(9600, this);
+		if(!comDevice.isConnected())
+			Toast.makeText(getApplicationContext(), "Could not connect to the device",
+					   Toast.LENGTH_LONG).show();
 		// For each of the sections in the app, add a tab to the action bar.
 		for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
 			// Create a tab with text corresponding to the page title defined by
