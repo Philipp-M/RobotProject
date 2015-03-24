@@ -1,0 +1,153 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".RobotWASDFragment" >
+	
+    <GridLayout
+        
+        android:layout_width="match_parent"
+        android:layout_height="230dp"
+        android:columnCount="1" >
+
+        <Button
+            android:id="@+id/robot_wasd_buttonX"
+            android:layout_width="80dp"
+            android:layout_height="60dp"
+            android:layout_column="0"
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_row="0"
+            
+            android:text="X" />
+
+        <Button
+            android:id="@+id/robot_wasd_buttonA"
+            android:layout_width="80dp"
+            android:layout_height="60dp"
+            android:layout_column="0"
+            android:layout_gravity="left|center_vertical"
+            android:layout_row="0"
+            android:text="A" />
+
+        <Button
+            android:id="@+id/robot_wasd_buttonS"
+            android:layout_width="80dp"
+            android:layout_height="60dp"
+            android:layout_column="0"
+            android:layout_gravity="center"
+            android:layout_row="0"
+            android:text="S" />
+
+        <Button
+            android:id="@+id/robot_wasd_buttonD"
+            android:layout_width="80dp"
+            android:layout_height="60dp"
+            android:layout_column="0"
+            android:layout_gravity="right|center_vertical"
+            android:layout_row="0"
+            android:text="D" />
+
+        <Button
+            android:id="@+id/robot_wasd_buttonW"
+            android:layout_width="80dp"
+            android:layout_height="60dp"
+            android:layout_column="0"
+            android:layout_gravity="center_horizontal|top"
+            android:layout_row="0"
+            android:text="W" />
+
+        <Button
+            android:id="@+id/ButtonDown"
+            android:layout_width="80dp"
+            android:layout_height="60dp"
+            android:layout_column="0"
+            android:layout_gravity="left|bottom"
+            android:layout_row="0"
+            android:text="Down" />
+
+        <Button
+            android:id="@+id/ButtonUp"
+            android:layout_width="80dp"
+            android:layout_height="60dp"
+            android:layout_column="0"
+            android:layout_gravity="right|bottom"
+            android:layout_row="0"
+            android:text="Up" />
+
+        <Button
+            android:id="@+id/ButtonMinus"
+            android:layout_width="80dp"
+            android:layout_height="60dp"
+            android:layout_column="0"
+            android:layout_gravity="left|top"
+            android:layout_row="0"
+            android:text="-" />
+
+        <Button
+            android:id="@+id/ButtonPlus"
+            android:layout_width="80dp"
+            android:layout_height="60dp"
+            android:layout_column="0"
+            android:layout_gravity="right|top"
+            android:layout_row="0"
+            android:text="+" />
+
+    </GridLayout>
+
+    <RelativeLayout
+        android:id="@+id/RelativeLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.61"
+        android:orientation="vertical" >
+
+        <Button
+            android:id="@+id/robot_wasd_buttonLedOn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:minHeight="60dp"
+            android:minWidth="80dp"
+            android:text="LED on" />
+
+        <Button
+            android:id="@+id/robot_wasd_buttonLedOff"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/robot_wasd_buttonLedOn"
+            android:layout_alignBottom="@+id/robot_wasd_buttonLedOn"
+            android:layout_alignParentRight="true"
+            android:minHeight="60dp"
+            android:minWidth="80dp"
+            android:text="LED off" />
+
+        <Button
+            android:id="@+id/robot_wasd_buttonSensor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:minHeight="60dp"
+            android:minWidth="80dp"
+            android:text="Read Sensor" />
+
+        <EditText
+            android:id="@+id/robot_wasd_textLog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/robot_wasd_buttonLedOn"
+            android:ems="10"
+            android:enabled="false"
+            android:scrollbars="none"
+            android:textSize="12sp" >
+
+            <requestFocus />
+        </EditText>
+    </RelativeLayout>
+
+</LinearLayout>
