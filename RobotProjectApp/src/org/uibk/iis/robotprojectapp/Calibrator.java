@@ -50,7 +50,7 @@ public class Calibrator {
 		 *            second data
 		 * @return the product of both
 		 */
-		public Data multiply(Data d1, Data d2) {
+		public static Data multiply(Data d1, Data d2) {
 			if (d1.SLOW_VAL != d2.SLOW_VAL || d1.MEDM_VAL != d2.MEDM_VAL || d1.FAST_VAL != d2.FAST_VAL)
 				throw new IllegalArgumentException("different calibration speed values!");
 
@@ -67,9 +67,112 @@ public class Calibrator {
 
 	public Calibrator(SensorManager sensorManager, int slowVal, int medmVal, int fastVal) {
 		this.sensorManager = sensorManager;
-		this.slowVal = slowVal;
-		this.medmVal = medmVal;
-		this.fastVal = fastVal;
+		if (slowVal < 1)
+			this.slowVal = 1;
+		else if (slowVal > 127)
+			this.slowVal = 127;
+		else
+			this.slowVal = slowVal;
+		if (medmVal < 1)
+			this.medmVal = 1;
+		else if (medmVal > 127)
+			this.medmVal = 127;
+		else
+			this.medmVal = medmVal;
+		if (fastVal < 1)
+			this.fastVal = 1;
+		else if (fastVal > 127)
+			this.fastVal = 127;
+		else
+			this.fastVal = fastVal;
+		// sort velocities just for safety
+		if (this.slowVal < this.medmVal) {
+			if (this.medmVal > this.fastVal) {
+				if (this.slowVal < this.fastVal) {
+					int tmp = this.medmVal;
+					this.medmVal = this.fastVal;
+					this.fastVal = this.medmVal;
+				} else {
+					int tmp = this.medmVal;
+					int tmp2 = this.fastVal;
+					this.medmVal = this.slowVal;
+					this.fastVal = tmp;
+					this.slowVal = tmp2;
+				}
+			}
+		} else {
+			if (this.slowVal < this.fastVal) {
+				int tmp = this.medmVal;
+				this.medmVal = this.slowVal;
+				this.slowVal = tmp;
+			} else {
+				if (this.medmVal < this.fastVal) {
+					int tmp = this.medmVal;
+					int tmp2 = this.fastVal;
+					this.fastVal = this.slowVal;
+					this.slowVal = tmp;
+					this.medmVal = tmp2;
+				} else {
+					int tmp = this.fastVal;
+					this.fastVal = this.slowVal;
+					this.slowVal = tmp;
+				}
+			}
+		}
+	}
+
+	public Data calibrate(final Type type) {
+		switch (type) {
+		case LEFT_WHEEL_SLOW:
+			return calibrateLeftSlow();
+		case RIGHT_WHEEL_SLOW:
+			return calibrateRightSlow();
+		case LEFT_WHEEL_MEDM:
+			return calibrateLeftMedm();
+		case RIGHT_WHEEL_MEDM:
+			return calibrateRightMedm();
+		case LEFT_WHEEL_FAST:
+			return calibrateLeftFast();
+		case RIGHT_WHEEL_FAST:
+			return calibrateRightFast();
+		case SLOW:
+			return Data.multiply(calibrateLeftSlow(), calibrateRightSlow());
+		case MEDM:
+			return Data.multiply(calibrateLeftMedm(), calibrateRightMedm());
+		case FAST:
+			return Data.multiply(calibrateLeftFast(), calibrateRightFast());
+		case ALL:
+		default:
+			return Data.multiply(
+					Data.multiply(Data.multiply(calibrateLeftSlow(), calibrateRightSlow()),
+							Data.multiply(calibrateLeftMedm(), calibrateRightMedm())),
+					Data.multiply(calibrateLeftFast(), calibrateRightFast()));
+
+		}
+	}
+
+	private Data calibrateLeftSlow() {
+
+	}
+
+	private Data calibrateRightSlow() {
+
+	}
+
+	private Data calibrateLeftMedm() {
+
+	}
+
+	private Data calibrateRightMedm() {
+
+	}
+
+	private Data calibrateLeftFast() {
+
+	}
+
+	private Data calibrateRightFast() {
+
 	}
 
 }
