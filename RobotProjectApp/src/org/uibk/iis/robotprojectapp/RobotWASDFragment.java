@@ -21,7 +21,6 @@ public class RobotWASDFragment extends Fragment {
 	 * Returns a new instance of this fragment for the given section number.
 	 */
 	private TextView textLog;
-	private ComDriver comDevice;
 
 	public static RobotWASDFragment newInstance(int sectionNumber) {
 		RobotWASDFragment fragment = new RobotWASDFragment();
@@ -100,10 +99,6 @@ public class RobotWASDFragment extends Fragment {
 		return rootView;
 	}
 
-	public void initComDevice(ComDriver comDevice) {
-		this.comDevice = comDevice;
-	}
-
 	public void logText(String text) {
 		if (text.length() > 0) {
 			textLog.append("[" + text.length() + "] " + text + "\n");
@@ -113,44 +108,44 @@ public class RobotWASDFragment extends Fragment {
 	// move forward
 	public void buttonW_onClick(View v) {
 		logText("pressed forward");
-		if (comDevice.isConnected())
-			logText(comDevice.comReadWrite(new byte[] { 'w', '\r', '\n' }));
+		if (ComDriver.getInstance().isConnected())
+			logText(ComDriver.getInstance().comReadWrite(new byte[] { 'w', '\r', '\n' }));
 	}
 
 	// turn left
 	public void buttonA_onClick(View v) {
-		if (comDevice.isConnected())
-			logText(comDevice.comReadWrite(new byte[] { 'a', '\r', '\n' }));
+		if (ComDriver.getInstance().isConnected())
+			logText(ComDriver.getInstance().comReadWrite(new byte[] { 'a', '\r', '\n' }));
 	}
 
 	// stop
 	public void buttonS_onClick(View v) {
-		if (comDevice.isConnected())
-			logText(comDevice.comReadWrite(new byte[] { 's', '\r', '\n' }));
+		if (ComDriver.getInstance().isConnected())
+			logText(ComDriver.getInstance().comReadWrite(new byte[] { 's', '\r', '\n' }));
 	}
 
 	// turn right
 	public void buttonD_onClick(View v) {
-		if (comDevice.isConnected())
-			logText(comDevice.comReadWrite(new byte[] { 'd', '\r', '\n' }));
+		if (ComDriver.getInstance().isConnected())
+			logText(ComDriver.getInstance().comReadWrite(new byte[] { 'd', '\r', '\n' }));
 	}
 
 	// move backward
 	public void buttonX_onClick(View v) {
-		if (comDevice.isConnected())
-			logText(comDevice.comReadWrite(new byte[] { 'x', '\r', '\n' }));
+		if (ComDriver.getInstance().isConnected())
+			logText(ComDriver.getInstance().comReadWrite(new byte[] { 'x', '\r', '\n' }));
 	}
 
 	// lower bar a few degrees
 	public void buttonMinus_onClick(View v) {
-		if (comDevice.isConnected())
-			logText(comDevice.comReadWrite(new byte[] { '-', '\r', '\n' }));
+		if (ComDriver.getInstance().isConnected())
+			logText(ComDriver.getInstance().comReadWrite(new byte[] { '-', '\r', '\n' }));
 	}
 
 	// rise bar a few degrees
 	public void buttonPlus_onClick(View v) {
-		if (comDevice.isConnected())
-			logText(comDevice.comReadWrite(new byte[] { '+', '\r', '\n' }));
+		if (ComDriver.getInstance().isConnected())
+			logText(ComDriver.getInstance().comReadWrite(new byte[] { '+', '\r', '\n' }));
 	}
 
 	// fixed position for bar (low)
@@ -164,20 +159,20 @@ public class RobotWASDFragment extends Fragment {
 	}
 
 	public void buttonLedOn_onClick(View v) {
-		if (comDevice.isConnected())
-			logText(comDevice.comReadWrite(new byte[] { 'r', '\r', '\n' }));
+		if (ComDriver.getInstance().isConnected())
+			logText(ComDriver.getInstance().comReadWrite(new byte[] { 'r', '\r', '\n' }));
 		// robotSetLeds((byte) 255, (byte) 128);
 	}
 
 	public void buttonLedOff_onClick(View v) {
-		if (comDevice.isConnected())
-			logText(comDevice.comReadWrite(new byte[] { 'e', '\r', '\n' }));
+		if (ComDriver.getInstance().isConnected())
+			logText(ComDriver.getInstance().comReadWrite(new byte[] { 'e', '\r', '\n' }));
 		// robotSetLeds((byte) 0, (byte) 0);
 	}
 
 	public void buttonSensor_onClick(View v) {
-		if (comDevice.isConnected()) {
-			ArrayList<Byte> sensorData = comDevice.comReadBinWrite(new byte[] { 'p', '\r', '\b' });
+		if (ComDriver.getInstance().isConnected()) {
+			ArrayList<Byte> sensorData = ComDriver.getInstance().comReadBinWrite(new byte[] { 'p', '\r', '\b' });
 			logText("s0: " + (int) sensorData.get(0) + " s1: " + (int) sensorData.get(1) + " s2: " + (int) sensorData.get(2) + " s3: "
 					+ (int) (0xFF & sensorData.get(3)) + " s4: " + (int) sensorData.get(4) + " s5: " + (int) sensorData.get(5) + " s6: "
 					+ (int) sensorData.get(6) + " s7: " + (int) sensorData.get(7) + "\n");

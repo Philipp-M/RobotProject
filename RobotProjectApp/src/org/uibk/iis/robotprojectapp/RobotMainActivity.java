@@ -10,13 +10,11 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 public class RobotMainActivity extends ActionBarActivity implements
@@ -35,8 +33,6 @@ public class RobotMainActivity extends ActionBarActivity implements
 	 * The {@link ViewPager} that will host the section contents.
 	 */
 	ViewPager mViewPager;
-	
-	ComDriver comDevice;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +64,8 @@ public class RobotMainActivity extends ActionBarActivity implements
 				});
 		// Setup the Com device (Robot)
 		
-		comDevice = new ComDriver(9600, this);
-		if(!comDevice.isConnected())
+		ComDriver.getInstance().init(this, 9600);
+		if(!ComDriver.getInstance().isConnected())
 			Toast.makeText(getApplicationContext(), "Could not connect to the device",
 					   Toast.LENGTH_LONG).show();
 		// For each of the sections in the app, add a tab to the action bar.
@@ -136,11 +132,8 @@ public class RobotMainActivity extends ActionBarActivity implements
 			// getItem is called to instantiate the fragment for the given page.
 			// Return a PlaceholderFragment (defined as a static inner class
 			// below).
-			if(position == 0) {
-				RobotWASDFragment frag = RobotWASDFragment.newInstance(position + 1);
-				frag.initComDevice(comDevice);
-				return frag;
-			}
+			if(position == 0)
+				return RobotWASDFragment.newInstance(position + 1);
 			return PlaceholderFragment.newInstance(position + 1);
 		}
 

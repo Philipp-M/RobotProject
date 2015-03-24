@@ -5,14 +5,35 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.hardware.usb.UsbManager;
 import jp.ksksue.driver.serial.FTDriver;
-/// todo: make this class threadsafe...
+
+/// todo:	make this class threadsafe...
+///			throw exceptions if it isn't initialized
 public class ComDriver {
-	private FTDriver com;
-	
-	public ComDriver(int baudrate, Activity owner) {
-		com = new FTDriver((UsbManager) owner.getSystemService(android.content.Context.USB_SERVICE));
+	// Singleton for easy access, only allowed to use in one Activity
+	private static final class InstanceHolder {
+		static final ComDriver INSTANCE = new ComDriver();
+	}
+
+	private ComDriver() {
+	}
+
+	public static ComDriver getInstance() {
+		return InstanceHolder.INSTANCE;
+	}
+
+	// this method has to be called first otherwise the other methods won't work
+	public void init(Activity activity, int baudrate) {
+		com = new FTDriver((UsbManager) activity.getSystemService(android.content.Context.USB_SERVICE));
 		connect(baudrate);
 	}
+
+	private FTDriver com;
+
+	// public ComDriver(int baudrate, Activity owner) {
+	// com = new FTDriver((UsbManager)
+	// owner.getSystemService(android.content.Context.USB_SERVICE));
+	// connect(baudrate);
+	// }
 
 	/**
 	 * @todo should throw an exception
@@ -20,22 +41,30 @@ public class ComDriver {
 	 */
 	public void connect(int baudrate) {
 		// TODO implement permission request
-
-		if (com.begin(baudrate)) {
-			//textLog.append("connected\n");
-		} else {
-			//textLog.append("could not connect\n");
+		if (com != null) {
+			if (com.begin(baudrate)) {
+				// textLog.append("connected\n");
+			} else {
+				// textLog.append("could not connect\n");
+			}
 		}
 	}
 
 	public void disconnect() {
-		com.end();
+		if (com != null)
+			com.end();
 	}
+
 	public boolean isConnected() {
-		return com.isConnected();
+		if (com != null)
+			return com.isConnected();
+		else
+			return false;
 	}
+
 	/**
 	 * transfers given bytes via the serial connection.
+	 * 
 	 * @todo should throw an exception
 	 * @param data
 	 */
@@ -55,16 +84,19 @@ public class ComDriver {
 	 */
 	public String comRead() {
 		String s = "";
-		int i = 0;
-		int n = 0;
-		while (i < 3 || n > 0) {
-			byte[] buffer = new byte[256];
-			n = com.read(buffer);
-			s += new String(buffer, 0, n);
-			i++;
+		if (com != null) {
+			int i = 0;
+			int n = 0;
+			while (i < 3 || n > 0) {
+				byte[] buffer = new byte[256];
+				n = com.read(buffer);
+				s += new String(buffer, 0, n);
+				i++;
+			}
 		}
 		return s;
 	}
+
 	/**
 	 * reads from the serial buffer. due to buffering, the read command is
 	 * issued 3 times at minimum and continuously as long as there are bytes to
@@ -75,17 +107,20 @@ public class ComDriver {
 	 */
 	public ArrayList<Byte> comReadBin() {
 		ArrayList<Byte> b = new ArrayList<Byte>();
-		int i = 0;
-		int n = 0;
-		while (i < 3 || n > 0) {
-			byte[] buffer = new byte[256];
-			n = com.read(buffer);
-			for(int j = 0; j < n; j++) 
-				b.add(buffer[j]);
-			i++;
+		if (com != null) {
+			int i = 0;
+			int n = 0;
+			while (i < 3 || n > 0) {
+				byte[] buffer = new byte[256];
+				n = com.read(buffer);
+				for (int j = 0; j < n; j++)
+					b.add(buffer[j]);
+				i++;
+			}
 		}
 		return b;
 	}
+
 	/**
 	 * write data to serial interface, wait 50 ms and read answer.
 	 * 
@@ -94,21 +129,28 @@ public class ComDriver {
 	 * @return answer from serial interface
 	 */
 	public String comReadWrite(byte[] data) {
-		com.write(data);
-		try {
-			Thread.sleep(50);
-		} catch (InterruptedException e) {
-			// ignore
-		}
-		return comRead();
+		if (com != null) {
+			com.write(data);
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				// ignore
+			}
+			return comRead();
+		} else
+			return "";
 	}
+
 	public ArrayList<Byte> comReadBinWrite(byte[] data) {
-		com.write(data);
-		try {
-			Thread.sleep(50);
-		} catch (InterruptedException e) {
-			// ignore
-		}
-		return comReadBin();
+		if (com != null) {
+			com.write(data);
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				// ignore
+			}
+			return comReadBin();
+		} else
+			return new ArrayList<Byte>();
 	}
 }
