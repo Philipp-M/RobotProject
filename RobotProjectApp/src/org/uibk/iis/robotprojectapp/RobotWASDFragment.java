@@ -150,12 +150,14 @@ public class RobotWASDFragment extends Fragment {
 
 	// fixed position for bar (low)
 	public void buttonDown_onClick(View v) {
-		// robotSetBar((byte) 0);
+		if (ComDriver.getInstance().isConnected())
+			logText(ComDriver.getInstance().comReadWrite(new byte[] { 'o', 0, '\r', '\n' }));
 	}
 
 	// fixed position for bar (high)
 	public void buttonUp_onClick(View v) {
-		// robotSetBar((byte) 255);
+		if (ComDriver.getInstance().isConnected())
+			logText(ComDriver.getInstance().comReadWrite(new byte[] { 'o', (byte) 255, '\r', '\n' }));
 	}
 
 	public void buttonLedOn_onClick(View v) {

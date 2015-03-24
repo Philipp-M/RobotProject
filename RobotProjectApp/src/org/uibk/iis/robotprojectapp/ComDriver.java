@@ -6,8 +6,8 @@ import android.app.Activity;
 import android.hardware.usb.UsbManager;
 import jp.ksksue.driver.serial.FTDriver;
 
-/// todo:	make this class threadsafe...
-///			throw exceptions if it isn't initialized
+// TODO		make this class threadsafe...
+//			throw exceptions if it isn't initialized
 public class ComDriver {
 	// Singleton for easy access, only allowed to use in one Activity
 	private static final class InstanceHolder {

@@ -17,8 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-public class RobotMainActivity extends ActionBarActivity implements
-		ActionBar.TabListener {
+public class RobotMainActivity extends ActionBarActivity implements ActionBar.TabListener {
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -45,8 +44,7 @@ public class RobotMainActivity extends ActionBarActivity implements
 
 		// Create the adapter that will return a fragment for each of the three
 		// primary sections of the activity.
-		mSectionsPagerAdapter = new SectionsPagerAdapter(
-				getSupportFragmentManager());
+		mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
@@ -55,28 +53,26 @@ public class RobotMainActivity extends ActionBarActivity implements
 		// When swiping between different sections, select the corresponding
 		// tab. We can also use ActionBar.Tab#select() to do this if we have
 		// a reference to the Tab.
-		mViewPager
-				.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-					@Override
-					public void onPageSelected(int position) {
-						actionBar.setSelectedNavigationItem(position);
-					}
-				});
+		mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+			@Override
+			public void onPageSelected(int position) {
+				actionBar.setSelectedNavigationItem(position);
+			}
+		});
 		// Setup the Com device (Robot)
-		
+
 		ComDriver.getInstance().init(this, 9600);
-		if(!ComDriver.getInstance().isConnected())
-			Toast.makeText(getApplicationContext(), "Could not connect to the device",
-					   Toast.LENGTH_LONG).show();
+		if (ComDriver.getInstance().isConnected())
+			Toast.makeText(getApplicationContext(), "connected to the device!", Toast.LENGTH_LONG).show();
+		else
+			Toast.makeText(getApplicationContext(), "could not connect to the device!", Toast.LENGTH_LONG).show();
 		// For each of the sections in the app, add a tab to the action bar.
 		for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
 			// Create a tab with text corresponding to the page title defined by
 			// the adapter. Also specify this Activity object, which implements
 			// the TabListener interface, as the callback (listener) for when
 			// this tab is selected.
-			actionBar.addTab(actionBar.newTab()
-					.setText(mSectionsPagerAdapter.getPageTitle(i))
-					.setTabListener(this));
+			actionBar.addTab(actionBar.newTab().setText(mSectionsPagerAdapter.getPageTitle(i)).setTabListener(this));
 		}
 	}
 
@@ -96,25 +92,44 @@ public class RobotMainActivity extends ActionBarActivity implements
 		if (id == R.id.action_settings) {
 			return true;
 		}
-		return super.onOptionsItemSelected(item);
+		switch (item.getItemId()) {
+		case R.id.action_settings:
+			return true;
+
+		case R.id.connect:
+			ComDriver.getInstance().connect(9600);
+			if (ComDriver.getInstance().isConnected())
+				Toast.makeText(getApplicationContext(), "connected to the device!", Toast.LENGTH_LONG).show();
+			else
+				Toast.makeText(getApplicationContext(), "could not connect to the device!", Toast.LENGTH_LONG).show();
+			return true;
+
+		case R.id.disconnect:
+			ComDriver.getInstance().disconnect();
+			if (!ComDriver.getInstance().isConnected())
+				Toast.makeText(getApplicationContext(), "disconnected from the device!", Toast.LENGTH_LONG).show();
+			else
+				Toast.makeText(getApplicationContext(), "could not disconnect to the device!", Toast.LENGTH_LONG).show();
+			return true;
+
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
 
 	@Override
-	public void onTabSelected(ActionBar.Tab tab,
-			FragmentTransaction fragmentTransaction) {
+	public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
 		// When the given tab is selected, switch to the corresponding page in
 		// the ViewPager.
 		mViewPager.setCurrentItem(tab.getPosition());
 	}
 
 	@Override
-	public void onTabUnselected(ActionBar.Tab tab,
-			FragmentTransaction fragmentTransaction) {
+	public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
 	}
 
 	@Override
-	public void onTabReselected(ActionBar.Tab tab,
-			FragmentTransaction fragmentTransaction) {
+	public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
 	}
 
 	/**
@@ -132,7 +147,7 @@ public class RobotMainActivity extends ActionBarActivity implements
 			// getItem is called to instantiate the fragment for the given page.
 			// Return a PlaceholderFragment (defined as a static inner class
 			// below).
-			if(position == 0)
+			if (position == 0)
 				return RobotWASDFragment.newInstance(position + 1);
 			return PlaceholderFragment.newInstance(position + 1);
 		}
@@ -185,10 +200,8 @@ public class RobotMainActivity extends ActionBarActivity implements
 		}
 
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_robot_main,
-					container, false);
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+			View rootView = inflater.inflate(R.layout.fragment_robot_main, container, false);
 			return rootView;
 		}
 	}

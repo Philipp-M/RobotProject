@@ -8,5 +8,13 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/connect"
+        android:title="@string/Connect">
+    </item>
+    <item
+        android:id="@+id/disconnect"
+        android:title="@string/Disconnect">
+    </item>
 
 </menu>
