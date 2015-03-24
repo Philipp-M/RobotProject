@@ -61,7 +61,7 @@ public class RobotMainActivity extends ActionBarActivity implements ActionBar.Ta
 		});
 		// Setup the Com device (Robot)
 
-		ComDriver.getInstance().init(this, 9600);
+		ComDriver.getInstance().init(getBaseContext(), 9600);
 		if (ComDriver.getInstance().isConnected())
 			Toast.makeText(getApplicationContext(), "connected to the device!", Toast.LENGTH_LONG).show();
 		else

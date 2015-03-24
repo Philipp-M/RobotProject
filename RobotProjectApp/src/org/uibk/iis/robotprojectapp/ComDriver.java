@@ -2,7 +2,7 @@ package org.uibk.iis.robotprojectapp;
 
 import java.util.ArrayList;
 
-import android.app.Activity;
+import android.content.Context;
 import android.hardware.usb.UsbManager;
 import jp.ksksue.driver.serial.FTDriver;
 
@@ -22,18 +22,12 @@ public class ComDriver {
 	}
 
 	// this method has to be called first otherwise the other methods won't work
-	public void init(Activity activity, int baudrate) {
-		com = new FTDriver((UsbManager) activity.getSystemService(android.content.Context.USB_SERVICE));
+	public void init(Context context, int baudrate) {
+		com = new FTDriver((UsbManager) context.getSystemService(android.content.Context.USB_SERVICE));
 		connect(baudrate);
 	}
 
 	private FTDriver com;
-
-	// public ComDriver(int baudrate, Activity owner) {
-	// com = new FTDriver((UsbManager)
-	// owner.getSystemService(android.content.Context.USB_SERVICE));
-	// connect(baudrate);
-	// }
 
 	/**
 	 * @todo should throw an exception
