@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.hardware.usb.UsbManager;
 import jp.ksksue.driver.serial.FTDriver;
-
+/// todo: make this class threadsafe...
 public class ComDriver {
 	private FTDriver com;
 	
