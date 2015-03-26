@@ -3,12 +3,27 @@
 
     <string name="app_name">RobotProjectApp</string>
     <string name="title_section1">Robot WASD</string>
+    <string name="preferences_robot">Robot Preferences</string>
+    <string name="preferences_robot_calibration_type">Robot Calibration Type</string>
+    <string name="preferences_robot_calibration_time">Robot Calibration Time</string>
+    <string name="preferences_robot_left_wheel_slow">Robot Left Wheel Slow</string>
+    <string name="preferences_robot_right_wheel_slow">Robot Right Wheel Slow</string>
+    <string name="preferences_robot_left_wheel_medm">Robot Left Wheel Medium</string>
+    <string name="preferences_robot_right_wheel_medm">Robot Right Wheel Medium</string>
+    <string name="preferences_robot_left_wheel_fast">Robot Left Wheel Fast</string>
+    <string name="preferences_robot_right_wheel_fast">Robot Right Wheel Fast</string>
+    <string name="preferences_robot_slow_velocity">Robot Slow Velocity</string>
+    <string name="preferences_robot_medm_velocity">Robot Medium Velocity</string>
+    <string name="preferences_robot_fast_velocity">Robot Fast Velocity</string>
     <string name="title_section2">Quarter Drive</string>
     <string name="title_section3">Odometry</string>
     <string name="title_section4">Next Topic</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="Connect">Connect</string>
-    <string name="Disconnect">Disconnect</string>
+    <string name="connect">Connect</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="dialog_title_calibrating">Calibration</string>
+    <string name="dialog_calibrating">Calibrating the device please wait or press cancel to stop calibrating and discard the result</string>
+    <string name="cancel">Cancel</string>
 
 </resources>

@@ -59,8 +59,9 @@ public class RobotMainActivity extends ActionBarActivity implements ActionBar.Ta
 				actionBar.setSelectedNavigationItem(position);
 			}
 		});
-		// Setup the Com device (Robot)
-
+		// Setup the Com device (Robot) and the Bearing to North Provider
+		BearingToNorthSingleton.getInstance().init(this);
+		BearingToNorthSingleton.getInstance().start();
 		ComDriver.getInstance().init(getBaseContext(), 9600);
 		if (ComDriver.getInstance().isConnected())
 			Toast.makeText(getApplicationContext(), "connected to the device!", Toast.LENGTH_LONG).show();
@@ -111,7 +112,8 @@ public class RobotMainActivity extends ActionBarActivity implements ActionBar.Ta
 			else
 				Toast.makeText(getApplicationContext(), "could not disconnect to the device!", Toast.LENGTH_LONG).show();
 			return true;
-
+		case R.id.calibrate:
+			new CalibrationDialog(this).show();
 		default:
 			return super.onOptionsItemSelected(item);
 		}

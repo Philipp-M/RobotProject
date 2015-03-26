@@ -10,11 +10,15 @@
         app:showAsAction="never"/>
     <item
         android:id="@+id/connect"
-        android:title="@string/Connect">
+        android:title="@string/connect">
     </item>
     <item
         android:id="@+id/disconnect"
-        android:title="@string/Disconnect">
+        android:title="@string/disconnect">
+    </item>
+    <item
+        android:id="@+id/calibrate"
+        android:title="@string/dialog_title_calibrating">
     </item>
 
 </menu>
