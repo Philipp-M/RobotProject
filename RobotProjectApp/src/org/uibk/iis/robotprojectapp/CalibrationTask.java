@@ -1,8 +1,6 @@
 package org.uibk.iis.robotprojectapp;
 
 import android.app.Activity;
-import android.util.Log;
-
 import java.util.AbstractMap;
 import java.util.Map;
 import java.lang.Runnable;

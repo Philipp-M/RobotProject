@@ -72,9 +72,10 @@ public class DistanceMeasurementProvider {
 		return InstanceHolder.INSTANCE;
 	}
 
-	// this method has to be called first otherwise the other (listener) methods
-	// won't work
 	/**
+	 * this method has to be called first otherwise the other (listener) methods
+	 * won't work
+	 * 
 	 * @param deltaTime
 	 *            time between measurements has to be bigger than 115ms because
 	 *            the robot is to slow to answer(or to be exact it just sends
@@ -174,8 +175,8 @@ public class DistanceMeasurementProvider {
 		public void run() {
 			if (!BINARY_READING) {
 				try {
-				sensorStringParser(ComDriver.getInstance().comReadWrite(new byte[] { 'q', '\r', '\n' }));
-				} catch(IllegalArgumentException e) {
+					sensorStringParser(ComDriver.getInstance().comReadWrite(new byte[] { 'q', '\r', '\n' }));
+				} catch (IllegalArgumentException e) {
 					e.printStackTrace();
 				}
 			} else {
