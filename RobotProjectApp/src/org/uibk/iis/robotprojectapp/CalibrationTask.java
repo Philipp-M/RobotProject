@@ -335,9 +335,8 @@ public class CalibrationTask implements Runnable {
 		StopWatch sw = new StopWatch();
 		// start wheel(s) with given speed:
 		if (ComDriver.getInstance().isConnected())
-			ComDriver.getInstance().comWrite(new byte[] { 'i', leftVal, rightVal, '\r', '\n' });
+			ComDriver.getInstance().comReadWrite(new byte[] { 'i', leftVal, rightVal, '\r', '\n' });
 		sw.start();
-
 		while (sw.getTime() < time) {
 			Thread.sleep(BEARING_SAMPLING_TIME);
 			// Update the progressBar
@@ -353,16 +352,12 @@ public class CalibrationTask implements Runnable {
 			lastBearing = currentBearing;
 			turnAngle += deltaBearing;
 		}
-		// read unnecessary data before writing the next command
-		ComDriver.getInstance().comReadBin();
 		// stop wheel(s)
 		if (ComDriver.getInstance().isConnected())
-			ComDriver.getInstance().comWrite(new byte[] { 'i', 0, 0, '\r', '\n' });
+			ComDriver.getInstance().comReadWrite(new byte[] { 'i', 0, 0, '\r', '\n' });
 		sw.stop();
 		// sleep a little bit to get a better final value
 		Thread.sleep(BEARING_MEASURING_BREAK);
-		// read unnecessary data before writing the next command
-		ComDriver.getInstance().comReadBin();
 		return new AbstractMap.SimpleEntry<Double, Long>((turnAngle + getDeltaAngle(lastBearing, BearingToNorthSingleton.getInstance()
 				.getBearing() + 180.0)), sw.getTime());
 
