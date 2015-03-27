@@ -6,7 +6,6 @@ import android.content.Context;
 import android.hardware.usb.UsbManager;
 import jp.ksksue.driver.serial.FTDriver;
 
-// TODO		make this class threadsafe...
 //			throw exceptions if it isn't initialized
 public class ComDriver {
 	// Singleton for easy access, only allowed to use in one Activity
@@ -35,18 +34,22 @@ public class ComDriver {
 	 */
 	public void connect(int baudrate) {
 		// TODO implement permission request
-		if (com != null) {
-			if (com.begin(baudrate)) {
-				// textLog.append("connected\n");
-			} else {
-				// textLog.append("could not connect\n");
+		synchronized (this) {
+			if (com != null) {
+				if (com.begin(baudrate)) {
+					// textLog.append("connected\n");
+				} else {
+					// textLog.append("could not connect\n");
+				}
 			}
 		}
 	}
 
 	public void disconnect() {
-		if (com != null)
-			com.end();
+		synchronized (this) {
+			if (com != null)
+				com.end();
+		}
 	}
 
 	public boolean isConnected() {
@@ -63,8 +66,10 @@ public class ComDriver {
 	 * @param data
 	 */
 	public void comWrite(byte[] data) {
-		if (com.isConnected()) {
-			com.write(data);
+		synchronized (this) {
+			if (com.isConnected()) {
+				com.write(data);
+			}
 		}
 	}
 
@@ -77,18 +82,20 @@ public class ComDriver {
 	 * @return buffer content as string
 	 */
 	public String comRead() {
-		String s = "";
-		if (com != null) {
-			int i = 0;
-			int n = 0;
-			while (i < 3 || n > 0) {
-				byte[] buffer = new byte[256];
-				n = com.read(buffer);
-				s += new String(buffer, 0, n);
-				i++;
+		synchronized (this) {
+			String s = "";
+			if (com != null) {
+				int i = 0;
+				int n = 0;
+				while (i < 3 || n > 0) {
+					byte[] buffer = new byte[256];
+					n = com.read(buffer);
+					s += new String(buffer, 0, n);
+					i++;
+				}
 			}
+			return s;
 		}
-		return s;
 	}
 
 	/**
@@ -100,41 +107,48 @@ public class ComDriver {
 	 * @return buffer content as binary char array
 	 */
 	public ArrayList<Byte> comReadBin() {
-		ArrayList<Byte> b = new ArrayList<Byte>();
-		if (com != null) {
-			int i = 0;
-			int n = 0;
-			while (i < 3 || n > 0) {
-				byte[] buffer = new byte[256];
-				n = com.read(buffer);
-				for (int j = 0; j < n; j++)
-					b.add(buffer[j]);
-				i++;
+		synchronized (this) {
+			ArrayList<Byte> b = new ArrayList<Byte>();
+			if (com != null) {
+				int i = 0;
+				int n = 0;
+				while (i < 3 || n > 0) {
+					byte[] buffer = new byte[256];
+					n = com.read(buffer);
+					for (int j = 0; j < n; j++)
+						b.add(buffer[j]);
+					i++;
+				}
 			}
+			return b;
 		}
-		return b;
 	}
 
 	/**
-	 * write data to serial interface, don't(!) wait(not needed since the FTDriver waits) and read answer.
+	 * write data to serial interface, don't(!) wait(not needed since the
+	 * FTDriver waits) and read answer.
 	 * 
 	 * @param data
 	 *            to write
 	 * @return answer from serial interface
 	 */
 	public String comReadWrite(byte[] data) {
-		if (com != null) {
-			com.write(data);
-			return comRead();
-		} else
-			return "";
+		synchronized (this) {
+			if (com != null) {
+				com.write(data);
+				return comRead();
+			} else
+				return "";
+		}
 	}
 
 	public ArrayList<Byte> comReadBinWrite(byte[] data) {
-		if (com != null) {
-			com.write(data);
-			return comReadBin();
-		} else
-			return new ArrayList<Byte>();
+		synchronized (this) {
+			if (com != null) {
+				com.write(data);
+				return comReadBin();
+			} else
+				return new ArrayList<Byte>();
+		}
 	}
 }
