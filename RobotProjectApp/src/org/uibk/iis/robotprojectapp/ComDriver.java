@@ -116,7 +116,7 @@ public class ComDriver {
 	}
 
 	/**
-	 * write data to serial interface, wait 50 ms and read answer.
+	 * write data to serial interface, don't(!) wait(not needed since the FTDriver waits) and read answer.
 	 * 
 	 * @param data
 	 *            to write
@@ -125,11 +125,6 @@ public class ComDriver {
 	public String comReadWrite(byte[] data) {
 		if (com != null) {
 			com.write(data);
-			try {
-				Thread.sleep(50);
-			} catch (InterruptedException e) {
-				// ignore
-			}
 			return comRead();
 		} else
 			return "";
@@ -138,11 +133,6 @@ public class ComDriver {
 	public ArrayList<Byte> comReadBinWrite(byte[] data) {
 		if (com != null) {
 			com.write(data);
-			try {
-				Thread.sleep(50);
-			} catch (InterruptedException e) {
-				// ignore
-			}
 			return comReadBin();
 		} else
 			return new ArrayList<Byte>();
