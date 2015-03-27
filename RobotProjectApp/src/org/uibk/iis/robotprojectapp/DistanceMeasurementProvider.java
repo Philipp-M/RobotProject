@@ -16,7 +16,7 @@ public class DistanceMeasurementProvider {
 
 	public static interface ChangeEventListener {
 		/**
-		 * Callback method to be invoked when the distance changes.
+		 * Callback methods to be invoked when the distance changes.
 		 * 
 		 * @param left
 		 *            the left IR sensor measurement
@@ -27,7 +27,7 @@ public class DistanceMeasurementProvider {
 		 */
 		void onDistanceChanged(short left, short center, short right);
 
-		void onDistanceUnderThreshold(short left, short center, short right);
+		void onDistanceBelowThreshold(short left, short center, short right);
 	}
 
 	private ChangeEventListener changeEventListener;
@@ -42,21 +42,53 @@ public class DistanceMeasurementProvider {
 	private long deltaTime;
 	private short threshold;
 	private boolean belowThreshold;
-	
-	
+
+	/**
+	 * @param minDiffForEvent
+	 *            minimum difference('delta'-length) between two measurements to
+	 *            trigger an event to the listener
+	 * @param deltaTime
+	 *            time between measurements has to be bigger than 115ms because
+	 *            the robot is to slow to answer(or to be exact it just sends
+	 *            quite much overhead(String instead of binary) a fix is already
+	 *            available which reduces this delay to 35ms(BINARY_READING))
+	 * @param threshold
+	 *            below this value a belowThreshold event is sent, used for
+	 *            example as stopping detection
+	 */
 	public DistanceMeasurementProvider(short minDiffForEvent, long deltaTime, short threshold) {
 		this.minDiffForEvent = minDiffForEvent;
 		this.deltaTime = deltaTime;
 		this.threshold = threshold;
 		belowThreshold = false;
 	}
+
+	/**
+	 * starts the measurements
+	 */
 	public void start() {
 		measurementTimer = new Timer();
 		measurementTimer.scheduleAtFixedRate(new MeasurementTimerTask(), 0, deltaTime);
 	}
+
+	/**
+	 * stops the measurements
+	 */
 	public void stop() {
 		measurementTimer.cancel();
 	}
+
+	/**
+	 * needed for the text based reply(who ever came to the idea to send text
+	 * instead of binary over such a slow connection...)
+	 * 
+	 * @param sensorString
+	 *            the string to parse
+	 * @throws IllegalArgumentException
+	 *             thrown if the string is of incorrect syntax
+	 * @throws NumberFormatException
+	 *             thrown if the string is of incorrect syntax
+	 */
 	private void sensorStringParser(String sensorString) throws IllegalArgumentException, NumberFormatException {
 		String delims = "[ ]+";
 		String[] tokens = sensorString.split(delims);
@@ -85,7 +117,7 @@ public class DistanceMeasurementProvider {
 	private class MeasurementTimerTask extends TimerTask {
 		@Override
 		public void run() {
-			if(!BINARY_READING) {
+			if (!BINARY_READING) {
 				sensorStringParser(ComDriver.getInstance().comReadWrite(new byte[] { 'q', '\r', '\n' }));
 			} else {
 				ArrayList<Byte> sensorData = ComDriver.getInstance().comReadBinWrite(new byte[] { 'p', '\r', '\b' });
@@ -93,19 +125,22 @@ public class DistanceMeasurementProvider {
 				rightSensorValue = sensorData.get(RIGHT_SENSOR);
 				centerSensorValue = sensorData.get(CENTER_SENSOR);
 			}
-			if(Math.abs(lastLeftSensorValue -leftSensorValue) >= minDiffForEvent || Math.abs(lastRightSensorValue -rightSensorValue) >= minDiffForEvent || Math.abs(lastCenterSensorValue -centerSensorValue) >= minDiffForEvent ) {
+			if (Math.abs(lastLeftSensorValue - leftSensorValue) >= minDiffForEvent
+					|| Math.abs(lastRightSensorValue - rightSensorValue) >= minDiffForEvent
+					|| Math.abs(lastCenterSensorValue - centerSensorValue) >= minDiffForEvent) {
 				lastLeftSensorValue = leftSensorValue;
 				lastRightSensorValue = rightSensorValue;
 				lastCenterSensorValue = centerSensorValue;
-				if(changeEventListener != null) {
+				if (changeEventListener != null) {
 					changeEventListener.onDistanceChanged(leftSensorValue, centerSensorValue, rightSensorValue);
 				}
 			}
-			if(changeEventListener != null && !belowThreshold && (leftSensorValue <= threshold || rightSensorValue <= threshold || centerSensorValue <= threshold)) {
+			if (changeEventListener != null && !belowThreshold
+					&& (leftSensorValue <= threshold || rightSensorValue <= threshold || centerSensorValue <= threshold)) {
 				belowThreshold = true;
-				changeEventListener.onDistanceUnderThreshold(leftSensorValue, centerSensorValue, rightSensorValue);
+				changeEventListener.onDistanceBelowThreshold(leftSensorValue, centerSensorValue, rightSensorValue);
 			}
-			if((leftSensorValue > threshold && rightSensorValue > threshold && centerSensorValue <= threshold))
+			if ((leftSensorValue > threshold && rightSensorValue > threshold && centerSensorValue <= threshold))
 				belowThreshold = false;
 		}
 	}
