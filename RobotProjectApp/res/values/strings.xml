@@ -2,19 +2,8 @@
 <resources>
 
     <string name="app_name">RobotProjectApp</string>
+    <string name="title_section0">Preferences</string>
     <string name="title_section1">Robot WASD</string>
-    <string name="preferences_robot">Robot Preferences</string>
-    <string name="preferences_robot_calibration_type">Robot Calibration Type</string>
-    <string name="preferences_robot_calibration_time">Robot Calibration Time</string>
-    <string name="preferences_robot_left_wheel_slow">Robot Left Wheel Slow</string>
-    <string name="preferences_robot_right_wheel_slow">Robot Right Wheel Slow</string>
-    <string name="preferences_robot_left_wheel_medm">Robot Left Wheel Medium</string>
-    <string name="preferences_robot_right_wheel_medm">Robot Right Wheel Medium</string>
-    <string name="preferences_robot_left_wheel_fast">Robot Left Wheel Fast</string>
-    <string name="preferences_robot_right_wheel_fast">Robot Right Wheel Fast</string>
-    <string name="preferences_robot_slow_velocity">Robot Slow Velocity</string>
-    <string name="preferences_robot_medm_velocity">Robot Medium Velocity</string>
-    <string name="preferences_robot_fast_velocity">Robot Fast Velocity</string>
     <string name="title_section2">Quarter Drive</string>
     <string name="title_section3">Odometry</string>
     <string name="title_section4">Next Topic</string>
@@ -25,5 +14,27 @@
     <string name="dialog_title_calibrating">Calibration</string>
     <string name="dialog_calibrating">Calibrating the device please wait or press cancel to stop calibrating and discard the result</string>
     <string name="cancel">Cancel</string>
+    <!-- Preferences -->
+    <string name="preferences_robot">Robot Preferences</string>
+    <string name="preferences_robot_common">Common Options</string>
+    <string name="preferences_robot_common_summary">Settings like the unlocked mode</string>
+    <string name="preferences_robot_common_unlocked">Unlocked Mode</string>
+    <string name="preferences_robot_common_unlocked_summary">unlocks some stuff on the modded version of the robot like 25x times faster transfer speed</string>
+    <string name="preferences_robot_calibration">Calibration</string>
+    <string name="preferences_robot_calibration_summary">Calibration of the velocity of the wheels and the distance sensor</string>
+    <string name="preferences_robot_calibration_type">Calibration Type</string>
+    <string name="preferences_robot_calibration_time">Calibration Time</string>
+    <string name="preferences_robot_calibration_time_summary">Time per wheel calibration in ms</string>
+    <string name="preferences_robot_calibration_left_wheel_slow">Left Wheel Slow</string>
+    <string name="preferences_robot_calibration_right_wheel_slow">Right Wheel Slow</string>
+    <string name="preferences_robot_calibration_left_wheel_medm">Left Wheel Medium</string>
+    <string name="preferences_robot_calibration_right_wheel_medm">Right Wheel Medium</string>
+    <string name="preferences_robot_calibration_left_wheel_fast">Left Wheel Fast</string>
+    <string name="preferences_robot_calibration_right_wheel_fast">Right Wheel Fast</string>
+    <string name="preferences_robot_calibration_slow_velocity">Slow Velocity</string>
+    <string name="preferences_robot_calibration_medm_velocity">Medium Velocity</string>
+    <string name="preferences_robot_calibration_fast_velocity">Fast Velocity</string>
+    <string name="preferences_robot_calibration_wheel_velocity_summary">Speed in cm/s</string>
+    <string name="preferences_robot_calibration_velocity_summary">Range between 1–127, recommended 5–80</string>
 
 </resources>

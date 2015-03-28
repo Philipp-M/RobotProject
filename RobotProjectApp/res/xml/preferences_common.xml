@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="@string/preferences_robot_common" >
+        <CheckBoxPreference
+            android:key="@string/prefRobotUnlockedMode"
+            android:title="@string/preferences_robot_common_unlocked"
+            android:summary="@string/preferences_robot_common_unlocked_summary"
+            ></CheckBoxPreference>
+    </PreferenceCategory>
+
+</PreferenceScreen>

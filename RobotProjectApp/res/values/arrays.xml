@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="preferences_robot_calibration_type_list">
+        <item>All</item>
+        <item>Slow</item>
+        <item>Medium</item>
+        <item>Fast</item>
+        <item name="LEFT_WHEEL_SLOW">Left wheel slow</item>
+        <item name="RIGHT_WHEEL_SLOW">Right wheel slow</item>
+        <item name="LEFT_WHEEL_MEDM">Left wheel medium</item>
+        <item name="RIGHT_WHEEL_MEDM">Right wheel medium</item>
+        <item name="LEFT_WHEEL_FAST">Left wheel fast</item>
+        <item name="RIGHT_WHEEL_FAST">Right wheel fast</item>
+    </string-array>
+    <string-array name="preferences_robot_calibration_type_list_values">
+        <item>ALL</item>
+        <item>SLOW</item>
+        <item>MEDM</item>
+        <item>FAST</item>
+        <item>LEFT_WHEEL_SLOW</item>
+        <item>RIGHT_WHEEL_SLOW</item>
+        <item>LEFT_WHEEL_MEDM</item>
+        <item>RIGHT_WHEEL_MEDM</item>
+        <item>LEFT_WHEEL_FAST</item>
+        <item>RIGHT_WHEEL_FAST</item>
+    </string-array>
+
+</resources>

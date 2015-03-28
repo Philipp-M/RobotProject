@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="@string/preferences_robot_calibration" >
+        <ListPreference
+            android:dialogTitle="@string/preferences_robot_calibration_type"
+            android:entries="@array/preferences_robot_calibration_type_list"
+            android:entryValues="@array/preferences_robot_calibration_type_list_values"
+            android:key="@string/prefRobotCalibrationType"
+            android:title="@string/preferences_robot_calibration_type" />
+
+        <org.uibk.iis.robotprojectapp.IntEditTextPreference
+            android:dialogTitle="@string/preferences_robot_calibration_time"
+            android:key="@string/prefRobotCalibrationTime"
+            android:maxLength="5"
+            android:numeric="integer"
+            android:summary="@string/preferences_robot_calibration_time_summary"
+            android:title="@string/preferences_robot_calibration_time" />
+        <org.uibk.iis.robotprojectapp.IntEditTextPreference
+            android:dialogTitle="@string/preferences_robot_calibration_slow_velocity"
+            android:key="@string/prefRobotSlowVelocity"
+            android:maxLength="2"
+            android:numeric="integer"
+            android:summary="@string/preferences_robot_calibration_velocity_summary"
+            android:title="@string/preferences_robot_calibration_slow_velocity" />
+        <org.uibk.iis.robotprojectapp.IntEditTextPreference
+            android:dialogTitle="@string/preferences_robot_calibration_medm_velocity"
+            android:key="@string/prefRobotMedmVelocity"
+            android:maxLength="2"
+            android:numeric="integer"
+            android:summary="@string/preferences_robot_calibration_velocity_summary"
+            android:title="@string/preferences_robot_calibration_medm_velocity" />
+        <org.uibk.iis.robotprojectapp.IntEditTextPreference
+            android:dialogTitle="@string/preferences_robot_calibration_fast_velocity"
+            android:key="@string/prefRobotFastVelocity"
+            android:maxLength="2"
+            android:numeric="integer"
+            android:summary="@string/preferences_robot_calibration_velocity_summary"
+            android:title="@string/preferences_robot_calibration_fast_velocity" />
+
+        <org.uibk.iis.robotprojectapp.FloatEditTextPreference
+            android:dialogTitle="@string/preferences_robot_calibration_left_wheel_slow"
+            android:numeric="integer|decimal"
+            android:key="@string/prefRobotLeftWheelSlow"
+            android:summary="@string/preferences_robot_calibration_wheel_velocity_summary"
+            android:title="@string/preferences_robot_calibration_left_wheel_slow" />
+        <org.uibk.iis.robotprojectapp.FloatEditTextPreference
+            android:dialogTitle="@string/preferences_robot_calibration_right_wheel_slow"
+            android:numeric="integer|decimal"
+            android:key="@string/prefRobotRightWheelSlow"
+            android:summary="@string/preferences_robot_calibration_wheel_velocity_summary"
+            android:title="@string/preferences_robot_calibration_right_wheel_slow" />
+        <org.uibk.iis.robotprojectapp.FloatEditTextPreference
+            android:dialogTitle="@string/preferences_robot_calibration_left_wheel_medm"
+            android:numeric="integer|decimal"
+            android:key="@string/prefRobotLeftWheelMedm"
+            android:summary="@string/preferences_robot_calibration_wheel_velocity_summary"
+            android:title="@string/preferences_robot_calibration_left_wheel_medm" />
+        <org.uibk.iis.robotprojectapp.FloatEditTextPreference
+            android:dialogTitle="@string/preferences_robot_calibration_right_wheel_medm"
+            android:numeric="integer|decimal"
+            android:key="@string/prefRobotRightWheelMedm"
+            android:summary="@string/preferences_robot_calibration_wheel_velocity_summary"
+            android:title="@string/preferences_robot_calibration_right_wheel_medm" />
+        <org.uibk.iis.robotprojectapp.FloatEditTextPreference
+            android:dialogTitle="@string/preferences_robot_calibration_left_wheel_fast"
+            android:numeric="integer|decimal"
+            android:key="@string/prefRobotLeftWheelFast"
+            android:summary="@string/preferences_robot_calibration_wheel_velocity_summary"
+            android:title="@string/preferences_robot_calibration_left_wheel_fast" />
+        <org.uibk.iis.robotprojectapp.FloatEditTextPreference
+            android:dialogTitle="@string/preferences_robot_calibration_right_wheel_fast"
+            android:numeric="integer|decimal"
+            android:key="@string/prefRobotRightWheelFast"
+            android:summary="@string/preferences_robot_calibration_wheel_velocity_summary"
+            android:title="@string/preferences_robot_calibration_right_wheel_fast" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

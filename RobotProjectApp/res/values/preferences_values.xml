@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Calibration -->
+    <string name="prefRobotCalibrationType">prefRobotCalibrationType</string>
+    <string name="prefRobotCalibrationTime">prefRobotCalibrationTime</string>
+    <string name="prefRobotLeftWheelSlow">prefRobotLeftWheelSlow</string>
+    <string name="prefRobotRightWheelSlow">prefRobotRightWheelSlow</string>
+    <string name="prefRobotLeftWheelMedm">prefRobotLeftWheelMedm</string>
+    <string name="prefRobotRightWheelMedm">prefRobotRightWheelMedm</string>
+    <string name="prefRobotLeftWheelFast">prefRobotLeftWheelFast</string>
+    <string name="prefRobotRightWheelFast">prefRobotRightWheelFast</string>
+    <string name="prefRobotSlowVelocity">prefRobotSlowVelocity</string>
+    <string name="prefRobotMedmVelocity">prefRobotMedmVelocity</string>
+    <string name="prefRobotFastVelocity">prefRobotFastVelocity</string>
+    <!-- Common -->
+    <string name="prefRobotUnlockedMode">prefRobotUnlockedMode</string>
+
+</resources>

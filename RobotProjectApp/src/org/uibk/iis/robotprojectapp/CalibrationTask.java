@@ -1,6 +1,7 @@
 package org.uibk.iis.robotprojectapp;
 
 import android.app.Activity;
+
 import java.util.AbstractMap;
 import java.util.Map;
 import java.lang.Runnable;
@@ -501,17 +502,18 @@ public class CalibrationTask implements Runnable {
 	public void run() {
 		estimatedTime = calculateEstimatedTime();
 		stopwatch.start();
-		
+
 		try {
 			final Data result = calibrate();
 			activity.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-			callbackHandler.onFinishedCalibration(result);
+					callbackHandler.onFinishedCalibration(result);
 				}
 			});
 		} catch (IllegalArgumentException e) {
-			ComDriver.getInstance().comReadWrite(new byte[] { 'i', 0, 0, '\r', '\n' });
+			if (ComDriver.getInstance().isConnected())
+				ComDriver.getInstance().comReadWrite(new byte[] { 'i', 0, 0, '\r', '\n' });
 			activity.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
@@ -522,7 +524,8 @@ public class CalibrationTask implements Runnable {
 			});
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			ComDriver.getInstance().comReadWrite(new byte[] { 'i', 0, 0, '\r', '\n' });
+			if (ComDriver.getInstance().isConnected())
+				ComDriver.getInstance().comReadWrite(new byte[] { 'i', 0, 0, '\r', '\n' });
 			activity.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {

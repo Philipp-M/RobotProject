@@ -8,7 +8,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -63,6 +65,12 @@ public class RobotMainActivity extends ActionBarActivity implements ActionBar.Ta
 		BearingToNorthSingleton.getInstance().init(this);
 		BearingToNorthSingleton.getInstance().start();
 		ComDriver.getInstance().init(getBaseContext(), 9600);
+		if (ComDriver.getInstance().isConnected()
+				&& PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.prefRobotUnlockedMode), false)) {
+			ComDriver.getInstance().comWrite(new byte[] { 'b', '\r', '\b' });
+			ComDriver.getInstance().init(getBaseContext(), 250000);
+			ComDriver.getInstance().comWrite(new byte[] { 'i', 0, 0, '\r', '\n' });
+		}
 		if (ComDriver.getInstance().isConnected())
 			Toast.makeText(getApplicationContext(), "connected to the device!", Toast.LENGTH_LONG).show();
 		else
@@ -73,7 +81,10 @@ public class RobotMainActivity extends ActionBarActivity implements ActionBar.Ta
 			// the adapter. Also specify this Activity object, which implements
 			// the TabListener interface, as the callback (listener) for when
 			// this tab is selected.
-			actionBar.addTab(actionBar.newTab().setText(mSectionsPagerAdapter.getPageTitle(i)).setTabListener(this));
+			if (i == 1)
+				actionBar.addTab(actionBar.newTab().setText(mSectionsPagerAdapter.getPageTitle(i)).setTabListener(this), true);
+			else
+				actionBar.addTab(actionBar.newTab().setText(mSectionsPagerAdapter.getPageTitle(i)).setTabListener(this), false);
 		}
 	}
 
@@ -89,16 +100,22 @@ public class RobotMainActivity extends ActionBarActivity implements ActionBar.Ta
 		// Handle action bar item clicks here. The action bar will
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
 		switch (item.getItemId()) {
 		case R.id.action_settings:
+			Intent i = new Intent(this, PreferencesActivity.class);
+			startActivityForResult(i, 1);
 			return true;
 
 		case R.id.connect:
-			ComDriver.getInstance().connect(9600);
+			if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.prefRobotUnlockedMode), false)) {
+				ComDriver.getInstance().init(getBaseContext(), 9600);
+				if (ComDriver.getInstance().isConnected()) {
+					ComDriver.getInstance().comWrite(new byte[] { 'b', '\r', '\b' });
+					ComDriver.getInstance().init(getBaseContext(), 250000);
+					ComDriver.getInstance().comWrite(new byte[] { 'i', 0, 0, '\r', '\n' });
+				}
+			} else
+				ComDriver.getInstance().connect(9600);
 			if (ComDriver.getInstance().isConnected())
 				Toast.makeText(getApplicationContext(), "connected to the device!", Toast.LENGTH_LONG).show();
 			else
