@@ -9,7 +9,7 @@ import java.lang.Runnable;
 public class CalibrationTask implements Runnable {
 
 	public static final long BEARING_SAMPLING_TIME = 100;
-	public static final double BEARING_THRESHOLD_ANGLE = 110.0;
+	public static final double BEARING_THRESHOLD_ANGLE = 130.0;
 	public static final long BEARING_MEASURING_BREAK = 2500;
 	// has to be measured more precisely
 	public static final double ROBOT_AXLE_LENGTH = 18.7;

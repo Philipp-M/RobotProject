@@ -81,9 +81,9 @@ public class RobotMainActivity extends ActionBarActivity implements ActionBar.Ta
 			// the adapter. Also specify this Activity object, which implements
 			// the TabListener interface, as the callback (listener) for when
 			// this tab is selected.
-			if (i == 1)
-				actionBar.addTab(actionBar.newTab().setText(mSectionsPagerAdapter.getPageTitle(i)).setTabListener(this), true);
-			else
+//			if (i == 1)
+//				actionBar.addTab(actionBar.newTab().setText(mSectionsPagerAdapter.getPageTitle(i)).setTabListener(this), true);
+//			else
 				actionBar.addTab(actionBar.newTab().setText(mSectionsPagerAdapter.getPageTitle(i)).setTabListener(this), false);
 		}
 	}

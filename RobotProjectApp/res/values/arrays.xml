@@ -6,12 +6,12 @@
         <item>Slow</item>
         <item>Medium</item>
         <item>Fast</item>
-        <item name="LEFT_WHEEL_SLOW">Left wheel slow</item>
-        <item name="RIGHT_WHEEL_SLOW">Right wheel slow</item>
-        <item name="LEFT_WHEEL_MEDM">Left wheel medium</item>
-        <item name="RIGHT_WHEEL_MEDM">Right wheel medium</item>
-        <item name="LEFT_WHEEL_FAST">Left wheel fast</item>
-        <item name="RIGHT_WHEEL_FAST">Right wheel fast</item>
+        <item>Left wheel slow</item>
+        <item>Right wheel slow</item>
+        <item>Left wheel medium</item>
+        <item>Right wheel medium</item>
+        <item>Left wheel fast</item>
+        <item>Right wheel fast</item>
     </string-array>
     <string-array name="preferences_robot_calibration_type_list_values">
         <item>ALL</item>
