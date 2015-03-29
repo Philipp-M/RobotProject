@@ -1,7 +1,9 @@
 package org.uibk.iis.robotprojectapp;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.KeyEvent;
@@ -17,21 +19,22 @@ import android.widget.TextView;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 
-public class QuadDriverFragment extends Fragment {
+public class QuadDriverFragment extends Fragment implements QuadDriverListener {
 	/**
 	 * The fragment argument representing the section number for this fragment.
 	 */
 	private static final String ARG_SECTION_NUMBER = "section_number";
-
-	/**
-	 * Returns a new instance of this fragment for the given section number.
-	 */
+	private Context context;
 	private TextView textLog;
+	private Thread quadDriverJob;
 	private double distancePerEdge;
 	private short robotSpeed;
 	private float robotSpeedCmL;
 	private float robotSpeedCmR;
 
+	/**
+	 * Returns a new instance of this fragment for the given section number.
+	 */
 	public static QuadDriverFragment newInstance(int sectionNumber) {
 		QuadDriverFragment fragment = new QuadDriverFragment();
 		Bundle args = new Bundle();
@@ -44,13 +47,16 @@ public class QuadDriverFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		final View rootView = inflater.inflate(R.layout.fragment_robot_quad_drive, container, false);
 		textLog = (TextView) rootView.findViewById(R.id.robot_quad_drive_textLog);
+		context = rootView.getContext();
 		// get Robot speed from the preferences
 		robotSpeed = (short) PreferenceManager.getDefaultSharedPreferences(rootView.getContext()).getInt(
 				rootView.getContext().getString(R.string.prefRobotSlowVelocity), 18);
-		robotSpeedCmL = (short) PreferenceManager.getDefaultSharedPreferences(rootView.getContext()).getFloat(
-				rootView.getContext().getString(R.string.prefRobotLeftWheelSlow), 6.0f);
-		robotSpeedCmR = (short) PreferenceManager.getDefaultSharedPreferences(rootView.getContext()).getFloat(
-				rootView.getContext().getString(R.string.prefRobotRightWheelSlow), 6.0f);
+		robotSpeedCmL = PreferenceManager.getDefaultSharedPreferences(rootView.getContext()).getFloat(
+				rootView.getContext().getString(R.string.prefRobotLeftWheelSlow), 8.2f);
+		robotSpeedCmR = PreferenceManager.getDefaultSharedPreferences(rootView.getContext()).getFloat(
+				rootView.getContext().getString(R.string.prefRobotRightWheelSlow), 8.2f);
+		distancePerEdge = PreferenceManager.getDefaultSharedPreferences(rootView.getContext()).getFloat(
+				rootView.getContext().getString(R.string.prefRobotQuadDriveDistance), 20.0f);
 		Spinner spinner = (Spinner) rootView.findViewById(R.id.robot_quad_drive_speed_spinner);
 		// Create an ArrayAdapter using the string array and a default spinner
 		// layout
@@ -136,7 +142,132 @@ public class QuadDriverFragment extends Fragment {
 	public void buttonStartQuadDrive_onClick(View v) {
 
 		if (ComDriver.getInstance().isConnected()) {
-			//logText(ComDriver.getInstance().comReadWrite(new byte[] { 'w', '\r', '\n' }));
+			logText("starting the Quad Drive...");
+			quadDriverJob = new Thread(new QuadDriveRunnable(distancePerEdge, robotSpeed, robotSpeedCmL, robotSpeedCmR, this));
+			quadDriverJob.start();
 		}
+	}
+
+	private static class QuadDriveRunnable implements Runnable {
+		private short robotSpeed;
+		private float robotSpeedCmL;
+		private float robotSpeedCmR;
+		private double distancePerEdge;
+		private QuadDriverListener listener;
+
+		public QuadDriveRunnable(double distancePerEdge, short robotSpeed, float robotSpeedCmL, float robotSpeedCmR,
+				QuadDriverListener listener) {
+			this.robotSpeed = robotSpeed;
+			this.robotSpeedCmL = robotSpeedCmL;
+			this.robotSpeedCmR = robotSpeedCmR;
+			this.listener = listener;
+			this.distancePerEdge = distancePerEdge;
+		}
+
+		private void driveForward() throws InterruptedException {
+			ComDriver cm = ComDriver.getInstance();
+			StopWatch sw = new StopWatch();
+			boolean leftFaster = robotSpeedCmL > robotSpeedCmR ? true : false;
+			// was to lazy to code nicer, which is definitely possible ;)
+			if (leftFaster) {
+				float timeL = (float) (distancePerEdge / (double)robotSpeedCmL);
+				float timeR = (float) distancePerEdge / robotSpeedCmR;
+				sw.start();
+				cm.comReadWrite(new byte[] { 'i', (byte) robotSpeed, (byte) robotSpeed, '\r', '\n' });
+				listener.onUpdate("time: " + (timeL * 1000.0f));
+				Thread.sleep((long) (timeL * 1000.0f));
+				cm.comReadWrite(new byte[] { 'i', (byte) 0, (byte) robotSpeed, '\r', '\n' });
+				long curTime = sw.getTime();
+				if ((long) (timeR * 1000.0f) - curTime > 0)
+					Thread.sleep((long) (timeR * 1000.0f) - curTime);
+				cm.comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
+			} else {
+				float timeL = (float) distancePerEdge / robotSpeedCmL;
+				float timeR = (float) distancePerEdge / robotSpeedCmR;
+				sw.start();
+				cm.comReadWrite(new byte[] { 'i', (byte) robotSpeed, (byte) robotSpeed, '\r', '\n' });
+				Thread.sleep((long) (timeR * 1000.0f));
+				cm.comReadWrite(new byte[] { 'i', (byte) robotSpeed, (byte) 0, '\r', '\n' });
+				long curTime = sw.getTime();
+				if ((long) (timeL * 1000.0f) - curTime > 0) {
+					Thread.sleep((long) (timeL * 1000.0f) - curTime);
+					cm.comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
+				}
+			}
+		}
+
+		private void turnRight90Degrees() throws InterruptedException {
+			double wheelDistance = Math.PI / 2.0 * CalibrationTask.ROBOT_AXLE_LENGTH;
+			float time = (float) wheelDistance / robotSpeedCmL;
+			ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) robotSpeed, (byte) 0, '\r', '\n' });
+			Thread.sleep((long) (time * 1000.0f));
+			ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
+		}
+
+		@SuppressWarnings("unused")
+		private void turnLeft90Degrees() throws InterruptedException {
+			double wheelDistance = Math.PI / 2.0 * CalibrationTask.ROBOT_AXLE_LENGTH;
+			float time = (float) wheelDistance / robotSpeedCmR;
+			ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) robotSpeed, '\r', '\n' });
+			Thread.sleep((long) (time * 1000.0f));
+			ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
+		}
+
+		@Override
+		public void run() {
+			ComDriver cm = ComDriver.getInstance();
+			if (cm.isConnected()) {
+				try {
+					// ************* The interesting Stuff is here ;)
+					// *************
+					listener.onUpdate("driving first edge");
+					driveForward();
+					listener.onUpdate("turning the first time");
+					turnRight90Degrees();
+					listener.onUpdate("driving second edge");
+					driveForward();
+					listener.onUpdate("turning the second time");
+					turnRight90Degrees();
+					listener.onUpdate("driving third edge");
+					driveForward();
+					listener.onUpdate("turning the third time");
+					turnRight90Degrees();
+					listener.onUpdate("driving last edge");
+					driveForward();
+					listener.onUpdate("turning the last time");
+					turnRight90Degrees();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+					listener.onFinished();
+				}
+			}
+			listener.onFinished();
+		}
+	}
+
+	@Override
+	public void onUpdate(final String message) {
+		Handler mainHandler = new Handler(context.getMainLooper());
+		mainHandler.post(new Runnable() {
+			@Override
+			public void run() {
+				logText(message);
+			}
+		});
+	}
+
+	@Override
+	public void onFinished() {
+		Handler mainHandler = new Handler(context.getMainLooper());
+		mainHandler.post(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					quadDriverJob.join();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 }
