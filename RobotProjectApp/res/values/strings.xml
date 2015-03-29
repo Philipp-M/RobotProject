@@ -4,7 +4,7 @@
     <string name="app_name">RobotProjectApp</string>
     <string name="title_section0">Preferences</string>
     <string name="title_section1">Robot WASD</string>
-    <string name="title_section2">Quarter Drive</string>
+    <string name="title_section2">Quad Drive</string>
     <string name="title_section3">Odometry</string>
     <string name="title_section4">Next Topic</string>
     <string name="hello_world">Hello world!</string>
@@ -14,6 +14,8 @@
     <string name="dialog_title_calibrating">Calibration</string>
     <string name="dialog_calibrating">Calibrating the device please wait or press cancel to stop calibrating and discard the result</string>
     <string name="cancel">Cancel</string>
+    <string name="robot_quad_drive_distance_to_drive_hint">distance to drive in cm at one edge</string>
+    <string name="robot_quad_drive_start">Start!</string>
     <!-- Preferences -->
     <string name="preferences_robot">Robot Preferences</string>
     <string name="preferences_robot_common">Common Options</string>

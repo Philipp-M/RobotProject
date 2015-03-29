@@ -15,5 +15,7 @@
     <string name="prefRobotFastVelocity">prefRobotFastVelocity</string>
     <!-- Common -->
     <string name="prefRobotUnlockedMode">prefRobotUnlockedMode</string>
+    <!-- Fragment specific stuff -->
+    <string name="prefRobotQuadDriveDistance">prefRobotQuadDriveDistance</string>
 
 </resources>

@@ -168,6 +168,8 @@ public class RobotMainActivity extends ActionBarActivity implements ActionBar.Ta
 			// below).
 			if (position == 0)
 				return RobotWASDFragment.newInstance(position + 1);
+			else if(position == 1)
+				return QuadDriverFragment.newInstance(position + 1);
 			return PlaceholderFragment.newInstance(position + 1);
 		}
 
