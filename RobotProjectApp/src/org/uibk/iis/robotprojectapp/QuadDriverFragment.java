@@ -168,32 +168,14 @@ public class QuadDriverFragment extends Fragment implements QuadDriverListener {
 			ComDriver cm = ComDriver.getInstance();
 			StopWatch sw = new StopWatch();
 			boolean leftFaster = robotSpeedCmL > robotSpeedCmR ? true : false;
-			// was to lazy to code nicer, which is definitely possible ;)
-			if (leftFaster) {
-				float timeL = (float) (distancePerEdge / (double)robotSpeedCmL);
-				float timeR = (float) distancePerEdge / robotSpeedCmR;
-				sw.start();
-				cm.comReadWrite(new byte[] { 'i', (byte) robotSpeed, (byte) robotSpeed, '\r', '\n' });
-				listener.onUpdate("time: " + (timeL * 1000.0f));
-				Thread.sleep((long) (timeL * 1000.0f));
-				cm.comReadWrite(new byte[] { 'i', (byte) 0, (byte) robotSpeed, '\r', '\n' });
-				long curTime = sw.getTime();
-				if ((long) (timeR * 1000.0f) - curTime > 0)
-					Thread.sleep((long) (timeR * 1000.0f) - curTime);
-				cm.comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
-			} else {
-				float timeL = (float) distancePerEdge / robotSpeedCmL;
-				float timeR = (float) distancePerEdge / robotSpeedCmR;
-				sw.start();
-				cm.comReadWrite(new byte[] { 'i', (byte) robotSpeed, (byte) robotSpeed, '\r', '\n' });
-				Thread.sleep((long) (timeR * 1000.0f));
-				cm.comReadWrite(new byte[] { 'i', (byte) robotSpeed, (byte) 0, '\r', '\n' });
-				long curTime = sw.getTime();
-				if ((long) (timeL * 1000.0f) - curTime > 0) {
-					Thread.sleep((long) (timeL * 1000.0f) - curTime);
-					cm.comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
-				}
-			}
+
+			float timeL = (float) (distancePerEdge / (double) robotSpeedCmL);
+			float timeR = (float) (distancePerEdge / (double) robotSpeedCmR);
+			sw.start();
+			cm.comReadWrite(new byte[] { 'i', (byte) robotSpeed, (byte) ((float) robotSpeed * timeR / timeL), '\r', '\n' });
+			Thread.sleep((long) (timeL * 1000.0f));
+			cm.comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
+
 		}
 
 		private void turnRight90Degrees() throws InterruptedException {
