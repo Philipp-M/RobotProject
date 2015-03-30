@@ -166,12 +166,9 @@ public class QuadDriverFragment extends Fragment implements QuadDriverListener {
 
 		private void driveForward() throws InterruptedException {
 			ComDriver cm = ComDriver.getInstance();
-			StopWatch sw = new StopWatch();
-			boolean leftFaster = robotSpeedCmL > robotSpeedCmR ? true : false;
 
 			float timeL = (float) (distancePerEdge / (double) robotSpeedCmL);
 			float timeR = (float) (distancePerEdge / (double) robotSpeedCmR);
-			sw.start();
 			cm.comReadWrite(new byte[] { 'i', (byte) robotSpeed, (byte) ((float) robotSpeed * timeR / timeL), '\r', '\n' });
 			Thread.sleep((long) (timeL * 1000.0f));
 			cm.comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
