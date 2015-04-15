@@ -1,6 +1,9 @@
 package org.uibk.iis.robotprojectapp;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import java.util.AbstractMap;
 import java.util.Map;
@@ -49,6 +52,20 @@ public class CalibrationTask implements Runnable {
 			this.SLOW_VAL = SLOW_VAL;
 			this.MEDM_VAL = MEDM_VAL;
 			this.FAST_VAL = FAST_VAL;
+		}
+
+		public static Data loadSavedData(Context context) {
+			SharedPreferences robotPref = PreferenceManager.getDefaultSharedPreferences(context);
+			int slowVel = robotPref.getInt(context.getString(R.string.prefRobotSlowVelocity), 18);
+			int medmVel = robotPref.getInt(context.getString(R.string.prefRobotMedmVelocity), 32);
+			int fastVel = robotPref.getInt(context.getString(R.string.prefRobotFastVelocity), 55);
+			double speedSlowL = (double) robotPref.getFloat(context.getString(R.string.prefRobotLeftWheelSlow), 16.2f);
+			double speedSlowR = (double) robotPref.getFloat(context.getString(R.string.prefRobotRightWheelSlow), 16.2f);
+			double speedMedmL = (double) robotPref.getFloat(context.getString(R.string.prefRobotLeftWheelMedm), 29.2f);
+			double speedMedmR = (double) robotPref.getFloat(context.getString(R.string.prefRobotRightWheelMedm), 29.2f);
+			double speedFastL = (double) robotPref.getFloat(context.getString(R.string.prefRobotLeftWheelFast), 50.5f);
+			double speedFastR = (double) robotPref.getFloat(context.getString(R.string.prefRobotRightWheelFast), 50.5f);
+			return new Data(speedSlowL, speedSlowR, speedMedmL, speedMedmR, speedFastL, speedFastR, slowVel, medmVel, fastVel);
 		}
 
 		/**
