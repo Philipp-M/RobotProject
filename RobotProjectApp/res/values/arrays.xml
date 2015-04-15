@@ -25,5 +25,10 @@
         <item>LEFT_WHEEL_FAST</item>
         <item>RIGHT_WHEEL_FAST</item>
     </string-array>
+    <string-array name="robot_quad_drive_speed_array">
+        <item>Slow</item>
+        <item>Medium</item>
+        <item>Fast</item>
+    </string-array>
 
 </resources>

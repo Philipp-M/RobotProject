@@ -379,7 +379,7 @@ public class CalibrationTask implements Runnable {
 			}
 		});
 		Map.Entry<Double, Long> angleTimePair = measureTotalAngle((byte) slowVal, (byte) 0);
-		double distance = angleTimePair.getKey() / 360.0 * Math.PI * ROBOT_AXLE_LENGTH;
+		double distance = angleTimePair.getKey() / 360.0 * 2.0 * Math.PI * ROBOT_AXLE_LENGTH;
 		// return centimeter per second
 		return new Data(Math.abs(distance / ((double) angleTimePair.getValue() / 1000.0)), 0, 0, 0, 0, 0, slowVal, medmVal, fastVal);
 	}
@@ -401,7 +401,7 @@ public class CalibrationTask implements Runnable {
 			}
 		});
 		Map.Entry<Double, Long> angleTimePair = measureTotalAngle((byte) 0, (byte) slowVal);
-		double distance = angleTimePair.getKey() / 360.0 * Math.PI * ROBOT_AXLE_LENGTH;
+		double distance = angleTimePair.getKey() / 360.0 * 2.0 * Math.PI * ROBOT_AXLE_LENGTH;
 		// return centimeter per second
 		return new Data(0, Math.abs(distance / ((double) angleTimePair.getValue() / 1000.0)), 0, 0, 0, 0, slowVal, medmVal, fastVal);
 	}
@@ -423,7 +423,7 @@ public class CalibrationTask implements Runnable {
 			}
 		});
 		Map.Entry<Double, Long> angleTimePair = measureTotalAngle((byte) medmVal, (byte) 0);
-		double distance = angleTimePair.getKey() / 360.0 * Math.PI * ROBOT_AXLE_LENGTH;
+		double distance = angleTimePair.getKey() / 360.0 * 2.0 * Math.PI * ROBOT_AXLE_LENGTH;
 		// return centimeter per second
 		return new Data(0, 0, Math.abs(distance / ((double) angleTimePair.getValue() / 1000.0)), 0, 0, 0, slowVal, medmVal, fastVal);
 
@@ -446,7 +446,7 @@ public class CalibrationTask implements Runnable {
 			}
 		});
 		Map.Entry<Double, Long> angleTimePair = measureTotalAngle((byte) 0, (byte) medmVal);
-		double distance = angleTimePair.getKey() / 360.0 * Math.PI * ROBOT_AXLE_LENGTH;
+		double distance = angleTimePair.getKey() / 360.0 * 2.0 * Math.PI * ROBOT_AXLE_LENGTH;
 		// return centimeter per second
 		return new Data(0, 0, 0, Math.abs(distance / ((double) angleTimePair.getValue() / 1000.0)), 0, 0, slowVal, medmVal, fastVal);
 	}
@@ -468,7 +468,7 @@ public class CalibrationTask implements Runnable {
 			}
 		});
 		Map.Entry<Double, Long> angleTimePair = measureTotalAngle((byte) fastVal, (byte) 0);
-		double distance = angleTimePair.getKey() / 360.0 * Math.PI * ROBOT_AXLE_LENGTH;
+		double distance = angleTimePair.getKey() / 360.0 * 2.0 * Math.PI * ROBOT_AXLE_LENGTH;
 		// return centimeter per second
 		return new Data(0, 0, 0, 0, Math.abs(distance / ((double) angleTimePair.getValue() / 1000.0)), 0, slowVal, medmVal, fastVal);
 	}
@@ -490,7 +490,7 @@ public class CalibrationTask implements Runnable {
 			}
 		});
 		Map.Entry<Double, Long> angleTimePair = measureTotalAngle((byte) 0, (byte) fastVal);
-		double distance = angleTimePair.getKey() / 360.0 * Math.PI * ROBOT_AXLE_LENGTH;
+		double distance = angleTimePair.getKey() / 360.0 * 2.0 * Math.PI * ROBOT_AXLE_LENGTH;
 		// return centimeter per second
 		return new Data(0, 0, 0, 0, 0, Math.abs(distance / ((double) angleTimePair.getValue() / 1000.0)), slowVal, medmVal, fastVal);
 	}

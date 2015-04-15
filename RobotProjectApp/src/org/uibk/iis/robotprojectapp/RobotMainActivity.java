@@ -112,7 +112,7 @@ public class RobotMainActivity extends ActionBarActivity implements ActionBar.Ta
 				if (ComDriver.getInstance().isConnected()) {
 					ComDriver.getInstance().comWrite(new byte[] { 'b', '\r', '\b' });
 					ComDriver.getInstance().init(getBaseContext(), 250000);
-					ComDriver.getInstance().comWrite(new byte[] { 'i', 0, 0, '\r', '\n' });
+					ComDriver.getInstance().comReadWrite(new byte[] { 'i', 0, 0, '\r', '\n' });
 				}
 			} else
 				ComDriver.getInstance().connect(9600);
@@ -168,6 +168,8 @@ public class RobotMainActivity extends ActionBarActivity implements ActionBar.Ta
 			// below).
 			if (position == 0)
 				return RobotWASDFragment.newInstance(position + 1);
+			else if(position == 1)
+				return QuadDriverFragment.newInstance(position + 1);
 			return PlaceholderFragment.newInstance(position + 1);
 		}
 
