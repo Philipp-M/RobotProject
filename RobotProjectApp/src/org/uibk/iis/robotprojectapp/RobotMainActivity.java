@@ -64,7 +64,11 @@ public class RobotMainActivity extends ActionBarActivity implements ActionBar.Ta
 		// Setup the Com device (Robot) and the Bearing to North Provider
 		BearingToNorthSingleton.getInstance().init(this);
 		BearingToNorthSingleton.getInstance().start();
+		
 		ComDriver.getInstance().init(getBaseContext(), 9600);
+		
+		OdometryManager.getInstance().init(this, 0, 0, 0);
+		
 		if (ComDriver.getInstance().isConnected()
 				&& PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.prefRobotUnlockedMode), false)) {
 			ComDriver.getInstance().comWrite(new byte[] { 'b', '\r', '\b' });
