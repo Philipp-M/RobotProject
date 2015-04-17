@@ -107,7 +107,6 @@ public class RobotWASDFragment extends Fragment {
 
 	// move forward
 	public void buttonW_onClick(View v) {
-		logText("pressed forward");
 		if (ComDriver.getInstance().isConnected())
 			logText(ComDriver.getInstance().comReadWrite(new byte[] { 'w', '\r', '\n' }));
 	}
@@ -174,10 +173,11 @@ public class RobotWASDFragment extends Fragment {
 
 	public void buttonSensor_onClick(View v) {
 		if (ComDriver.getInstance().isConnected()) {
-			ArrayList<Byte> sensorData = ComDriver.getInstance().comReadBinWrite(new byte[] { 'p', '\r', '\b' });
-			logText("s0: " + (int) sensorData.get(0) + " s1: " + (int) sensorData.get(1) + " s2: " + (int) sensorData.get(2) + " s3: "
-					+ (int) (0xFF & sensorData.get(3)) + " s4: " + (int) sensorData.get(4) + " s5: " + (int) sensorData.get(5) + " s6: "
-					+ (int) sensorData.get(6) + " s7: " + (int) sensorData.get(7) + "\n");
+			logText(ComDriver.getInstance().comReadWrite(new byte[] { 'q', '\r', '\n' }));
+//			ArrayList<Byte> sensorData = ComDriver.getInstance().comReadBinWrite(new byte[] { 'p', '\r', '\b' });
+//			logText("s0: " + (int) sensorData.get(0) + " s1: " + (int) sensorData.get(1) + " s2: " + (int) sensorData.get(2) + " s3: "
+//					+ (int) (0xFF & sensorData.get(3)) + " s4: " + (int) sensorData.get(4) + " s5: " + (int) sensorData.get(5) + " s6: "
+//					+ (int) sensorData.get(6) + " s7: " + (int) sensorData.get(7) + "\n");
 		}
 	}
 }
