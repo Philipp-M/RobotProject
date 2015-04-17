@@ -10,7 +10,7 @@ public class DistanceMeasurementProvider {
 	private static final short LEFT_SENSOR = 2;
 	private static final short RIGHT_SENSOR = 3;
 	private static final short CENTER_SENSOR = 6;
-	
+
 	private boolean binaryReading;
 
 	public static interface ChangeEventListener {
@@ -85,6 +85,7 @@ public class DistanceMeasurementProvider {
 		this.deltaTime = deltaTime;
 		this.binaryReading = false;
 	}
+
 	/**
 	 * a switch for the custom version, that can directly read the binary value
 	 */
@@ -95,6 +96,7 @@ public class DistanceMeasurementProvider {
 	public void setBinaryReading(boolean binaryReading) {
 		this.binaryReading = binaryReading;
 	}
+
 	/**
 	 * starts the measurements and listener events,
 	 */
@@ -152,14 +154,19 @@ public class DistanceMeasurementProvider {
 	private void sensorStringParser(String sensorString) throws IllegalArgumentException, NumberFormatException {
 		String delims = "\\s+";
 		String[] tokens = sensorString.split(delims);
-		if (tokens.length != 12)
+		int pitch = 3;
+		if (tokens.length != 12 || tokens.length != 9)
 			throw new IllegalArgumentException("Error while parsing string, the number of sensors is not as expected: " + tokens.length);
-		if (tokens[3].compareTo("sensor:") != 0)
+		if (tokens.length == 9)
+			pitch = 0;
+
+		if (tokens[pitch].compareTo("sensor:") != 0)
 			throw new IllegalArgumentException("Error while parsing string, the 'magic' bytes at the beginning do not match 'sensor:' : "
-					+ tokens[3]);
-		leftSensorValue = Short.decode(tokens[LEFT_SENSOR + 4]);
-		rightSensorValue = Short.decode(tokens[RIGHT_SENSOR + 4]);
-		centerSensorValue = Short.decode(tokens[CENTER_SENSOR + 4]);
+					+ tokens[pitch]);
+		leftSensorValue = Short.decode(tokens[LEFT_SENSOR + 1 + pitch]);
+		rightSensorValue = Short.decode(tokens[RIGHT_SENSOR + 1 + pitch]);
+		centerSensorValue = Short.decode(tokens[CENTER_SENSOR + 1 + pitch]);
+
 	}
 
 	public short getLeftSensorValue() {
