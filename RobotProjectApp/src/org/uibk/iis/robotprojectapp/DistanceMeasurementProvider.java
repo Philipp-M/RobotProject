@@ -10,10 +10,8 @@ public class DistanceMeasurementProvider {
 	private static final short LEFT_SENSOR = 2;
 	private static final short RIGHT_SENSOR = 3;
 	private static final short CENTER_SENSOR = 6;
-	/**
-	 * a switch for the custom version, that can directly read the binary value
-	 */
-	private static final boolean BINARY_READING = false;
+	
+	private boolean binaryReading;
 
 	public static interface ChangeEventListener {
 		/**
@@ -85,8 +83,18 @@ public class DistanceMeasurementProvider {
 	 */
 	public void init(long deltaTime) {
 		this.deltaTime = deltaTime;
+		this.binaryReading = false;
+	}
+	/**
+	 * a switch for the custom version, that can directly read the binary value
+	 */
+	public boolean isBinaryReading() {
+		return binaryReading;
 	}
 
+	public void setBinaryReading(boolean binaryReading) {
+		this.binaryReading = binaryReading;
+	}
 	/**
 	 * starts the measurements and listener events,
 	 */
@@ -173,7 +181,7 @@ public class DistanceMeasurementProvider {
 	private class MeasurementTimerTask extends TimerTask {
 		@Override
 		public void run() {
-			if (!BINARY_READING) {
+			if (!binaryReading) {
 				try {
 					sensorStringParser(ComDriver.getInstance().comReadWrite(new byte[] { 'q', '\r', '\n' }));
 				} catch (IllegalArgumentException e) {
