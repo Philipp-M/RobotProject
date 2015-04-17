@@ -22,7 +22,7 @@ public class BearingToNorthSingleton {
 
 	// this method has to be called first otherwise the other methods won't work
 	public void init(Context context) {
-		bearingToNorthProvider = new BearingToNorthProvider(context,17,0.5,50);
+		bearingToNorthProvider = new BearingToNorthProvider(context,17,0.5,50, false);
 	}
 
 	public double getBearing() {

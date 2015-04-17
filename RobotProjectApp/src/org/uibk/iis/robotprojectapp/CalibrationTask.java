@@ -224,17 +224,17 @@ public class CalibrationTask implements Runnable {
 		case RIGHT_WHEEL_MEDM:
 		case LEFT_WHEEL_FAST:
 		case RIGHT_WHEEL_FAST:
-			return time + BEARING_MEASURING_BREAK + 200; // extra time needed
+			return time + 2 * BEARING_MEASURING_BREAK; // extra time needed
 															// for measurement
 		case SLOW:
 		case MEDM:
 		case FAST:
-			return 2 * (time + BEARING_MEASURING_BREAK + 200); // extra time
+			return BEARING_MEASURING_BREAK + 2 * (time + BEARING_MEASURING_BREAK); // extra time
 																// needed for
 																// measurement
 		case ALL:
 		default:
-			return 6 * (time + BEARING_MEASURING_BREAK + 200); // extra time
+			return BEARING_MEASURING_BREAK + 6 * (time + BEARING_MEASURING_BREAK); // extra time
 																// needed for
 																// measurement
 		}
@@ -253,8 +253,8 @@ public class CalibrationTask implements Runnable {
 	 */
 	public Data calibrate() throws InterruptedException, IllegalArgumentException {
 		Data calLeftSlow, calRightSlow, calLeftMedm, calRightMedm, calLeftFast, calRightFast;
-		// wait a little for the remaining vibrations caused by the touch
-		Thread.sleep(200);
+		// wait a little for precalibration of the compass
+		Thread.sleep(BEARING_MEASURING_BREAK);
 		switch (type) {
 		case LEFT_WHEEL_SLOW:
 			return calibrateLeftSlow();
