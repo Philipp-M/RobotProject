@@ -63,7 +63,6 @@ public class RobotMainActivity extends ActionBarActivity implements ActionBar.Ta
 		});
 		// Setup the Com device (Robot) and the Bearing to North Provider
 		BearingToNorthSingleton.getInstance().init(this);
-		BearingToNorthSingleton.getInstance().start();
 		
 		ComDriver.getInstance().init(getBaseContext(), 9600);
 		

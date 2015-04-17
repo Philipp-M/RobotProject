@@ -28,6 +28,7 @@ public class CalibrationDialog extends ProgressDialog implements CalibrationTask
 				context.getString(R.string.prefRobotMedmVelocity), 32), robotPref.getInt(
 				context.getString(R.string.prefRobotFastVelocity), 55), CalibrationTask.Type.valueOf(robotPref.getString(
 				context.getString(R.string.prefRobotCalibrationType), CalibrationTask.Type.ALL.name()))));
+		BearingToNorthSingleton.getInstance().start();
 		calibrationThread.start();
 		setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
 			@Override
@@ -37,6 +38,7 @@ public class CalibrationDialog extends ProgressDialog implements CalibrationTask
 					calibrationThread.join();
 				} catch (InterruptedException e) {
 				}
+				BearingToNorthSingleton.getInstance().stop();
 				dialog.dismiss();
 			}
 		});
@@ -74,6 +76,7 @@ public class CalibrationDialog extends ProgressDialog implements CalibrationTask
 		} catch (InterruptedException e) {
 		}
 		// close the dialog...
+		BearingToNorthSingleton.getInstance().stop();
 		dismiss();
 	}
 
@@ -81,6 +84,7 @@ public class CalibrationDialog extends ProgressDialog implements CalibrationTask
 	public void onCanceledSuccessfully(boolean val) {
 		if (val == false)
 			Toast.makeText(context, "failed while calibrating, please try again!", Toast.LENGTH_LONG).show();
+		BearingToNorthSingleton.getInstance().stop();
 		dismiss();
 	}
 
