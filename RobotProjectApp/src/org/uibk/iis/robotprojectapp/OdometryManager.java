@@ -16,7 +16,7 @@ public class OdometryManager {
 		return InstanceHolder.INSTANCE;
 	}
 
-	public void init(Context context, double x, double y, double theta) {
+	public synchronized void init(Context context, double x, double y, double theta) {
 		robotSpeeds = CalibrationTask.Data.loadSavedData(context);
 		pos = new Position(x, y, theta);
 	}
@@ -25,7 +25,7 @@ public class OdometryManager {
 		return pos;
 	}
 
-	private void pivotAngleNonStopping(double theta, CalibrationTask.Type speed) throws InterruptedException {
+	private synchronized boolean pivotAngleNonStopping(double theta, CalibrationTask.Type speed) {
 		int robotSpeed;
 		double robotSpeedCmL;
 		double robotSpeedCmR;
@@ -60,10 +60,20 @@ public class OdometryManager {
 				ComDriver.getInstance().comReadWrite(
 						new byte[] { 'i', (byte) -Math.round(robotSpeed / 2.0),
 								(byte) Math.round((robotSpeed * robotSpeedCmL / robotSpeedCmR) / 2.0), '\r', '\n' });
-			Thread.sleep((long) (time * 1000.0f));
+			StopWatch sw = new StopWatch();
+			sw.start();
+			try {
+				Thread.sleep((long) (time * 1000.0f));
+			} catch (InterruptedException e) {
+				time = (double) sw.getTime() / 1000.0;
+				theta = -robotSpeedCmL * time / CalibrationTask.ROBOT_AXLE_LENGTH;
+				return false;
+			} finally {
+				// update current angle
+				pos.theta += theta;
+			}
 		}
-		// update current angle
-		pos.theta += theta;
+		return true;
 	}
 
 	/**
@@ -76,12 +86,13 @@ public class OdometryManager {
 	 *            interpreted as SLOW
 	 * @throws InterruptedException
 	 */
-	private void pivotAngle(double theta, CalibrationTask.Type speed) throws InterruptedException {
-		pivotAngleNonStopping(theta, speed);
+	private synchronized boolean pivotAngle(double theta, CalibrationTask.Type speed) {
+		boolean retVal = pivotAngleNonStopping(theta, speed);
 		ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
+		return retVal;
 	}
 
-	private void turnAngleNonStopping(double theta, CalibrationTask.Type speed) throws InterruptedException {
+	private synchronized boolean turnAngleNonStopping(double theta, CalibrationTask.Type speed) {
 		double robotSpeed;
 		double robotSpeedCmL;
 		double robotSpeedCmR;
@@ -109,29 +120,45 @@ public class OdometryManager {
 			time = Math.abs(theta) * CalibrationTask.ROBOT_AXLE_LENGTH / robotSpeedCmL;
 			if (time > 0.03) {
 				ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) robotSpeed, (byte) 0, '\r', '\n' });
-				Thread.sleep((long) (time * 1000.0f));
+				StopWatch sw = new StopWatch();
+				sw.start();
+				try {
+					Thread.sleep((long) (time * 1000.0f));
+				} catch (InterruptedException e) {
+					time = (double) sw.getTime() / 1000.0;
+					return false;
+				} finally {
+					// update current angle and position
+					pos.x += -CalibrationTask.ROBOT_AXLE_LENGTH / 2.0
+							* (Math.sin(-robotSpeedCmL * time / CalibrationTask.ROBOT_AXLE_LENGTH + pos.theta) - Math.sin(pos.theta));
+					pos.y += CalibrationTask.ROBOT_AXLE_LENGTH / 2.0
+							* (Math.cos(-robotSpeedCmL * time / CalibrationTask.ROBOT_AXLE_LENGTH + pos.theta) - Math.cos(pos.theta));
+					pos.theta += -robotSpeedCmL * time / CalibrationTask.ROBOT_AXLE_LENGTH;
+				}
 
-				// update current angle and position
-				pos.x += -CalibrationTask.ROBOT_AXLE_LENGTH / 2.0
-						* (Math.sin(-robotSpeedCmL * time / CalibrationTask.ROBOT_AXLE_LENGTH + pos.theta) - Math.sin(pos.theta));
-				pos.y += CalibrationTask.ROBOT_AXLE_LENGTH / 2.0
-						* (Math.cos(-robotSpeedCmL * time / CalibrationTask.ROBOT_AXLE_LENGTH + pos.theta) - Math.cos(pos.theta));
-				pos.theta += -robotSpeedCmL * time / CalibrationTask.ROBOT_AXLE_LENGTH;
 			}
 		} else {
 			time = Math.abs(theta) * CalibrationTask.ROBOT_AXLE_LENGTH / robotSpeedCmR;
 			if (time > 0.03) {
 				ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) robotSpeed, '\r', '\n' });
-				Thread.sleep((long) (time * 1000.0f));
-
-				// update current angle and position
-				pos.x += +CalibrationTask.ROBOT_AXLE_LENGTH / 2.0
-						* (Math.sin(robotSpeedCmR * time / CalibrationTask.ROBOT_AXLE_LENGTH + pos.theta) - Math.sin(pos.theta));
-				pos.y += -CalibrationTask.ROBOT_AXLE_LENGTH / 2.0
-						* (Math.cos(robotSpeedCmR * time / CalibrationTask.ROBOT_AXLE_LENGTH + pos.theta) - Math.cos(pos.theta));
-				pos.theta += -robotSpeedCmL * time / CalibrationTask.ROBOT_AXLE_LENGTH;
+				StopWatch sw = new StopWatch();
+				sw.start();
+				try {
+					Thread.sleep((long) (time * 1000.0f));
+				} catch (InterruptedException e) {
+					time = (double) sw.getTime() / 1000.0;
+					return false;
+				} finally {
+					// update current angle and position
+					pos.x += +CalibrationTask.ROBOT_AXLE_LENGTH / 2.0
+							* (Math.sin(robotSpeedCmR * time / CalibrationTask.ROBOT_AXLE_LENGTH + pos.theta) - Math.sin(pos.theta));
+					pos.y += -CalibrationTask.ROBOT_AXLE_LENGTH / 2.0
+							* (Math.cos(robotSpeedCmR * time / CalibrationTask.ROBOT_AXLE_LENGTH + pos.theta) - Math.cos(pos.theta));
+					pos.theta += -robotSpeedCmL * time / CalibrationTask.ROBOT_AXLE_LENGTH;
+				}
 			}
 		}
+		return true;
 	}
 
 	/**
@@ -145,12 +172,13 @@ public class OdometryManager {
 	 *            interpreted as SLOW
 	 * @throws InterruptedException
 	 */
-	public void turnAngle(double theta, CalibrationTask.Type speed) throws InterruptedException {
-		turnAngleNonStopping(theta, speed);
+	public synchronized boolean turnAngle(double theta, CalibrationTask.Type speed) {
+		boolean retVal = turnAngleNonStopping(theta, speed);
 		ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
+		return retVal;
 	}
 
-	private void driveForwardNonStopping(double distance, CalibrationTask.Type speed) throws InterruptedException {
+	private synchronized boolean driveForwardNonStopping(double distance, CalibrationTask.Type speed) {
 		double robotSpeed;
 		double robotSpeedCmL;
 		double robotSpeedCmR;
@@ -178,14 +206,23 @@ public class OdometryManager {
 		if (time > 0.03) {
 			ComDriver.getInstance().comReadWrite(
 					new byte[] { 'i', (byte) robotSpeed, (byte) (robotSpeed * robotSpeedCmL / robotSpeedCmR), '\r', '\n' });
-			Thread.sleep((long) (time * 1000.0f));
+			StopWatch sw = new StopWatch();
+			sw.start();
+			try {
+				Thread.sleep((long) (time * 1000.0f));
+			} catch (InterruptedException e) {
+				distance = (double) sw.getTime() / 1000.0 * robotSpeedCmL;
+				return false;
+			} finally {
+				// update current position
+				pos.x += Math.cos(pos.theta) * distance;
+				pos.y += Math.sin(pos.theta) * distance;
+			}
 		}
-		// update current position
-		pos.x += Math.cos(pos.theta) * distance;
-		pos.y += Math.sin(pos.theta) * distance;
+		return true;
 	}
 
-	public void driveForward(double distance, CalibrationTask.Type speed) {
+	public synchronized void driveForward(double distance, CalibrationTask.Type speed) {
 		driveForward(distance, speed);
 		ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
 	}
@@ -203,20 +240,20 @@ public class OdometryManager {
 	 *            can either be SLOW, MEDM or FAST, every other value will be
 	 *            interpreted as SLOW
 	 * @throws InterruptedException
+	 * @return if the execution went well 'true' else false
 	 */
-	public void driveStraightTo(double x, double y, double newTheta, CalibrationTask.Type speed) throws InterruptedException {
+	public synchronized boolean driveStraightTo(double x, double y, double newTheta, CalibrationTask.Type speed) {
 		double xDiff = x - pos.x;
 		double yDiff = y - pos.y;
 		double distance = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
 		if (distance > 0.2) {
 			double tmpTheta1 = (Math.asin(yDiff / distance) - pos.theta);
 			double tmpTheta2 = (newTheta - Math.asin(yDiff / distance));
-
-			pivotAngleNonStopping(tmpTheta1, speed);
-			driveForwardNonStopping(distance, speed);
-			pivotAngle(tmpTheta2, speed);
+			// following is possible due to "short-circuit-evaluation"
+			return (!Thread.interrupted() && pivotAngleNonStopping(tmpTheta1, speed) && !Thread.interrupted()
+					&& driveForwardNonStopping(distance, speed) && !Thread.interrupted() && pivotAngle(tmpTheta2, speed));
 		} else {
-			pivotAngle(newTheta - pos.theta, speed);
+			return (pivotAngle(newTheta - pos.theta, speed));
 		}
 	}
 
