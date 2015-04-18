@@ -67,6 +67,7 @@ public class RobotMainActivity extends ActionBarActivity implements ActionBar.Ta
 		ComDriver.getInstance().init(getBaseContext(), 9600);
 		
 		OdometryManager.getInstance().init(this, 0, 0, 0);
+		RobotMovementManager.getInstance().start();
 		
 		if (ComDriver.getInstance().isConnected()
 				&& PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.prefRobotUnlockedMode), false)) {
