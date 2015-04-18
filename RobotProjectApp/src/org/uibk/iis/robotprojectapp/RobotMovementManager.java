@@ -91,6 +91,19 @@ public class RobotMovementManager {
 	}
 
 	/**
+	 * sends an interrupt request and waits until it was handled
+	 */
+	public synchronized void interruptRequestBlocking() {
+		interruptRequest();
+		synchronized (commandLoopThread) {
+			try {
+				commandLoopThread.wait();
+			} catch (InterruptedException e) {
+			}
+		}
+	}
+
+	/**
 	 * adds a command to the queue
 	 *
 	 * @param command
@@ -124,6 +137,7 @@ public class RobotMovementManager {
 							OdometryManager.getInstance().stop();
 							interruptRequest = false;
 							currentCommand = null;
+							notifyAll();
 						} else if (currentCommand == null && !commandQueue.isEmpty()) {
 							currentCommand = new Thread(commandQueue.remove());
 							currentCommand.start();
@@ -148,7 +162,7 @@ public class RobotMovementManager {
 	/**
 	 * Command
 	 *
-	 * is controlled with an enum(RobotMovementManager.Commands) of command indentifiers optionally some Commands need some arguments (until
+	 * is controlled with an enum(RobotMovementManager.Commands) of command identifiers optionally some Commands need some arguments (until
 	 * now only numeric values are required so double was chosen as argument type
 	 *
 	 */
