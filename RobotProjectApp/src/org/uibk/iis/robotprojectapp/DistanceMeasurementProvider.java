@@ -10,6 +10,8 @@ public class DistanceMeasurementProvider {
 	private static final short LEFT_SENSOR = 2;
 	private static final short RIGHT_SENSOR = 3;
 	private static final short CENTER_SENSOR = 6;
+	public static final double SENSOR_DISTANCE = 5.8;
+	public static final double SENSOR_ANGLE = 0.26625205;
 
 	private boolean binaryReading;
 
@@ -155,7 +157,7 @@ public class DistanceMeasurementProvider {
 		String delims = "\\s+";
 		String[] tokens = sensorString.split(delims);
 		int pitch = 3;
-		if (tokens.length != 12 || tokens.length != 9)
+		if (tokens.length != 12 && tokens.length != 9)
 			throw new IllegalArgumentException("Error while parsing string, the number of sensors is not as expected: " + tokens.length);
 		if (tokens.length == 9)
 			pitch = 0;
@@ -199,6 +201,12 @@ public class DistanceMeasurementProvider {
 				leftSensorValue = sensorData.get(LEFT_SENSOR);
 				rightSensorValue = sensorData.get(RIGHT_SENSOR);
 				centerSensorValue = sensorData.get(CENTER_SENSOR);
+				if (leftSensorValue == -1)
+					leftSensorValue = 255;
+				if (rightSensorValue == -1)
+					rightSensorValue = 255;
+				if (centerSensorValue == -1)
+					centerSensorValue = 255;
 			}
 			for (ChangeEventListenerContainer cEListenCont : changeEventListeners) {
 				if (Math.abs(cEListenCont.lastLeftSensorValue - leftSensorValue) >= cEListenCont.minDiffForEvent
