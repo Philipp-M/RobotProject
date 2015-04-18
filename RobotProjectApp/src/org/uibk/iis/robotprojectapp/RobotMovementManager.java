@@ -4,6 +4,32 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class RobotMovementManager {
+	/**
+	 * Command identifiers
+	 *
+	 * Following describes a list of commands in the following order:
+	 *
+	 * COMMAND ARGUMENT1(comment) ARGUMENT2 ... #optionally Comment
+	 **************************************************************
+	 * Currently following Commands are supported:
+	 **************************************************************
+	 * TURN_NON_STOPPING SPEED(0, 1 or 2) ANGLE(in radian)
+	 *
+	 * TURN SPEED(0, 1 or 2) ANGLE(in radian)
+	 *
+	 * PIVOT_NON_STOPPING SPEED(0, 1 or 2) ANGLE(in radian)
+	 *
+	 * PIVOT SPEED(0, 1 or 2) ANGLE(in radian)
+	 *
+	 * FORWARD SPEED(0, 1 or 2) DISTANCE(in centimeters)
+	 *
+	 * FORWARD_NON_STOPPING SPEED(0, 1 or 2) DISTANCE(in centimeters)
+	 *
+	 * DRIVE_STRAIGHT_TO SPEED(0, 1 or 2) X(absolute coordinates in cm) Y(absolute coordinates in cm) ANGLE(in radian)
+	 *
+	 * STOP
+	 **************************************************************
+	 */
 	public enum Commands {
 		TURN_NON_STOPPING, TURN, PIVOT_NON_STOPPING, PIVOT, FORWARD_NON_STOPPING, FORWARD, DRIVE_STRAIGHT_TO, STOP
 	}
@@ -12,8 +38,7 @@ public class RobotMovementManager {
 	private boolean interruptRequest;
 	private Queue<Command> commandQueue;
 
-	// private Thread commandAddInterruptThread;
-
+	/**** Singleton stuff ****/
 	private static final class InstanceHolder {
 		static final RobotMovementManager INSTANCE = new RobotMovementManager();
 	}
@@ -26,6 +51,9 @@ public class RobotMovementManager {
 		return InstanceHolder.INSTANCE;
 	}
 
+	/**
+	 * starts the thread, that handles all of the commands that are committed to the robot
+	 */
 	public void start() {
 		if (commandLoopThread == null || !commandLoopThread.isAlive()) {
 			commandLoopThread = new Thread(new CommandLoop());
@@ -33,6 +61,9 @@ public class RobotMovementManager {
 		}
 	}
 
+	/**
+	 * stops the thread
+	 */
 	public void stop() {
 		if (commandLoopThread != null) {
 			commandLoopThread.interrupt();
@@ -43,18 +74,40 @@ public class RobotMovementManager {
 		}
 	}
 
+	/**
+	 * checks if an interrupt request was sent
+	 *
+	 * @return true if it was interrupted, false otherwise
+	 */
 	public boolean isInterrupted() {
 		return interruptRequest;
 	}
 
+	/**
+	 * sends an interrupt request
+	 */
 	public synchronized void interruptRequest() {
 		interruptRequest = true;
 	}
 
+	/**
+	 * adds a command to the queue
+	 *
+	 * @param command
+	 *            the command to be added
+	 */
 	public synchronized void addCommand(Command command) {
 		commandQueue.add(command);
 	}
 
+	/**
+	 * The Command looper thread
+	 *
+	 * handles all of the commands and the interrupt requests see also
+	 *
+	 * @RobotMovementManger.Commands
+	 *
+	 */
 	private class CommandLoop implements Runnable {
 
 		private Thread currentCommand;
@@ -92,6 +145,13 @@ public class RobotMovementManager {
 
 	}
 
+	/**
+	 * Command
+	 *
+	 * is controlled with an enum(RobotMovementManager.Commands) of command indentifiers optionally some Commands need some arguments (until
+	 * now only numeric values are required so double was chosen as argument type
+	 *
+	 */
 	public class Command implements Runnable {
 		private Commands command;
 		private double[] arguments;
