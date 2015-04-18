@@ -92,7 +92,7 @@ public class OdometryManager {
 		return retVal;
 	}
 
-	public synchronized boolean turnAngleNonStopping(double theta, CalibrationTask.Type speed) {
+	public synchronized boolean turnAngleNonStopping(double theta, CalibrationTask.Type speed, boolean reverse) {
 		double robotSpeed;
 		double robotSpeedCmL;
 		double robotSpeedCmR;
@@ -119,7 +119,7 @@ public class OdometryManager {
 		if (leftWheel) {
 			time = Math.abs(theta) * CalibrationTask.ROBOT_AXLE_LENGTH / robotSpeedCmL;
 			if (time > 0.03) {
-				ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) robotSpeed, (byte) 0, '\r', '\n' });
+				ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) ((reverse ? -1 : 1) * robotSpeed), (byte) 0, '\r', '\n' });
 				StopWatch sw = new StopWatch();
 				sw.start();
 				try {
@@ -129,11 +129,11 @@ public class OdometryManager {
 					return false;
 				} finally {
 					// update current angle and position
-					pos.x += -CalibrationTask.ROBOT_AXLE_LENGTH / 2.0
-							* (Math.sin(-robotSpeedCmL * time / CalibrationTask.ROBOT_AXLE_LENGTH + pos.theta) - Math.sin(pos.theta));
-					pos.y += CalibrationTask.ROBOT_AXLE_LENGTH / 2.0
-							* (Math.cos(-robotSpeedCmL * time / CalibrationTask.ROBOT_AXLE_LENGTH + pos.theta) - Math.cos(pos.theta));
-					pos.theta += -robotSpeedCmL * time / CalibrationTask.ROBOT_AXLE_LENGTH;
+					pos.x += (reverse ? -1 : 1) * (-CalibrationTask.ROBOT_AXLE_LENGTH / 2.0
+							* (Math.sin(-robotSpeedCmL * time / CalibrationTask.ROBOT_AXLE_LENGTH + pos.theta) - Math.sin(pos.theta)));
+					pos.y += (reverse ? -1 : 1) * (CalibrationTask.ROBOT_AXLE_LENGTH / 2.0
+							* (Math.cos(-robotSpeedCmL * time / CalibrationTask.ROBOT_AXLE_LENGTH + pos.theta) - Math.cos(pos.theta)));
+					pos.theta += (reverse ? -1 : 1) * (-robotSpeedCmL * time / CalibrationTask.ROBOT_AXLE_LENGTH);
 				}
 
 			}
@@ -172,18 +172,17 @@ public class OdometryManager {
 	 *            interpreted as SLOW
 	 * @throws InterruptedException
 	 */
-	public synchronized boolean turnAngle(double theta, CalibrationTask.Type speed) {
-		boolean retVal = turnAngleNonStopping(theta, speed);
+	public synchronized boolean turnAngle(double theta, CalibrationTask.Type speed, boolean reverse) {
+		boolean retVal = turnAngleNonStopping(theta, speed, reverse);
 		ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
 		return retVal;
 	}
-
-	public synchronized boolean driveForwardNonStopping(double distance, CalibrationTask.Type speed) {
+	public synchronized boolean driveForwardNonStopping(double distance, CalibrationTask.Type speed, boolean reverse) {
 		double robotSpeed;
 		double robotSpeedCmL;
 		double robotSpeedCmR;
 		double time;
-
+		distance = Math.abs(distance);
 		switch (speed) {
 		case MEDM:
 			robotSpeed = robotSpeeds.MEDM_VAL;
@@ -203,9 +202,14 @@ public class OdometryManager {
 			break;
 		}
 		time = distance / robotSpeedCmL;
+		distance = reverse ? -distance : distance;
 		if (time > 0.03) {
-			ComDriver.getInstance().comReadWrite(
+			if(!reverse)
+				ComDriver.getInstance().comReadWrite(
 					new byte[] { 'i', (byte) robotSpeed, (byte) (robotSpeed * robotSpeedCmL / robotSpeedCmR), '\r', '\n' });
+			else
+				ComDriver.getInstance().comReadWrite(
+						new byte[] { 'i', (byte) -robotSpeed, (byte) -(robotSpeed * robotSpeedCmL / robotSpeedCmR), '\r', '\n' });
 			StopWatch sw = new StopWatch();
 			sw.start();
 			try {
@@ -221,9 +225,18 @@ public class OdometryManager {
 		}
 		return true;
 	}
-
+	public synchronized boolean driveForwardNonStopping(double distance, CalibrationTask.Type speed) {
+		return driveForwardNonStopping(distance, speed, false);
+	}
+	public synchronized boolean driveBackwardsNonStopping(double distance, CalibrationTask.Type speed) {
+		return driveForwardNonStopping(distance, speed, true);
+	}
 	public synchronized void driveForward(double distance, CalibrationTask.Type speed) {
-		driveForward(distance, speed);
+		driveForwardNonStopping(distance, speed, false);
+		ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
+	}
+	public synchronized void driveBackwards(double distance, CalibrationTask.Type speed) {
+		driveForwardNonStopping(distance, speed, true);
 		ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
 	}
 	
