@@ -25,7 +25,7 @@ public class OdometryManager {
 		return pos;
 	}
 
-	private synchronized boolean pivotAngleNonStopping(double theta, CalibrationTask.Type speed) {
+	public synchronized boolean pivotAngleNonStopping(double theta, CalibrationTask.Type speed) {
 		int robotSpeed;
 		double robotSpeedCmL;
 		double robotSpeedCmR;
@@ -86,13 +86,13 @@ public class OdometryManager {
 	 *            interpreted as SLOW
 	 * @throws InterruptedException
 	 */
-	private synchronized boolean pivotAngle(double theta, CalibrationTask.Type speed) {
+	public synchronized boolean pivotAngle(double theta, CalibrationTask.Type speed) {
 		boolean retVal = pivotAngleNonStopping(theta, speed);
 		ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
 		return retVal;
 	}
 
-	private synchronized boolean turnAngleNonStopping(double theta, CalibrationTask.Type speed) {
+	public synchronized boolean turnAngleNonStopping(double theta, CalibrationTask.Type speed) {
 		double robotSpeed;
 		double robotSpeedCmL;
 		double robotSpeedCmR;
@@ -178,7 +178,7 @@ public class OdometryManager {
 		return retVal;
 	}
 
-	private synchronized boolean driveForwardNonStopping(double distance, CalibrationTask.Type speed) {
+	public synchronized boolean driveForwardNonStopping(double distance, CalibrationTask.Type speed) {
 		double robotSpeed;
 		double robotSpeedCmL;
 		double robotSpeedCmR;
@@ -224,6 +224,10 @@ public class OdometryManager {
 
 	public synchronized void driveForward(double distance, CalibrationTask.Type speed) {
 		driveForward(distance, speed);
+		ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
+	}
+	
+	public synchronized void stop() {
 		ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
 	}
 
