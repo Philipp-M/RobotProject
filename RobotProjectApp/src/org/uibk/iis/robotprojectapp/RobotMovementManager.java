@@ -1,6 +1,8 @@
 package org.uibk.iis.robotprojectapp;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 public class RobotMovementManager {
@@ -38,6 +40,11 @@ public class RobotMovementManager {
 		TURN_NON_STOPPING, TURN, PIVOT_NON_STOPPING, PIVOT, FORWARD_NON_STOPPING, FORWARD, BACKWARDS, BACKWARDS_NON_STOPPING, DRIVE_STRAIGHT_TO, STOP
 	}
 
+	public interface ChangeEventListener {
+		void onFinishedExecution();
+	}
+
+	private List<ChangeEventListener> changeEventListeners;
 	private Thread commandLoopThread;
 	private boolean interruptRequest;
 	private Queue<Command> commandQueue;
@@ -49,6 +56,7 @@ public class RobotMovementManager {
 
 	private RobotMovementManager() {
 		commandQueue = new LinkedList<RobotMovementManager.Command>();
+		changeEventListeners = new ArrayList<ChangeEventListener>();
 	}
 
 	public static RobotMovementManager getInstance() {
@@ -75,6 +83,27 @@ public class RobotMovementManager {
 				commandLoopThread.join();
 			} catch (InterruptedException e) {
 			}
+		}
+	}
+
+	/**
+	 * registers the given listener
+	 * 
+	 * @param changeEventListener
+	 */
+	public void registerListener(ChangeEventListener changeEventListener) {
+		changeEventListeners.add(changeEventListener);
+	}
+
+	/**
+	 * unregisters the given listener
+	 * 
+	 * @param changeEventListener
+	 */
+	public void unregisterListener(ChangeEventListener changeEventListener) {
+		for (ChangeEventListener cEL : changeEventListeners) {
+			if (cEL == changeEventListener)
+				changeEventListeners.remove(cEL);
 		}
 	}
 
@@ -135,7 +164,12 @@ public class RobotMovementManager {
 				try {
 					Thread.sleep(5);
 					synchronized (RobotMovementManager.getInstance()) {
-						if (isInterrupted()) {
+						if (isInterrupted() && currentCommand == null) {
+							interruptRequest = false;
+							notifyAll();
+							for (ChangeEventListener cEL : changeEventListeners)
+								cEL.onFinishedExecution();
+						} else if (isInterrupted() && currentCommand != null) {
 							currentCommand.interrupt();
 							currentCommand.join();
 							OdometryManager.getInstance().stop();
@@ -148,9 +182,11 @@ public class RobotMovementManager {
 						} else if (currentCommand != null && !currentCommand.isAlive()) {
 							currentCommand.join();
 
-							if (commandQueue.isEmpty())
+							if (commandQueue.isEmpty()) {
 								currentCommand = null;
-							else {
+								for (ChangeEventListener cEL : changeEventListeners)
+									cEL.onFinishedExecution();
+							} else {
 								currentCommand = new Thread(commandQueue.remove());
 								currentCommand.start();
 							}
