@@ -1,5 +1,7 @@
 package org.uibk.iis.robotprojectapp;
 
+import android.util.Log;
+
 public class ObstacleDetector implements DistanceMeasurementProvider.ChangeEventListener {
 
 	public interface ChangeEventListener {
@@ -23,23 +25,30 @@ public class ObstacleDetector implements DistanceMeasurementProvider.ChangeEvent
 	private ChangeEventListener changeEventListener;
 	private Detection lastDetection;
 
-	public ObstacleDetector(short minThreshold, short MaxThreshold, ChangeEventListener changeEventListener) {
-		DistanceMeasurementProvider.getInstance().registerListener(this, (short) 1, minThreshold);
+	public ObstacleDetector(short minThreshold, short maxThreshold, ChangeEventListener changeEventListener) {
+		this.minThreshold = minThreshold;
+		this.maxThreshold = maxThreshold;
 		this.changeEventListener = changeEventListener;
 		lastDetection = Detection.NONE;
+	}
+	public void start() {
+		DistanceMeasurementProvider.getInstance().registerListener(this, (short) 1, minThreshold, 1000);
+	}
+	public void stop() {
+		DistanceMeasurementProvider.getInstance().unregisterListener(this);
 	}
 
 	public ObstacleDetector(ChangeEventListener changeEventListener) {
 		this((short) 20, (short) 70, changeEventListener);
 	}
 
-	private double calculateLeftAngle(short left, short center) {
+	public static double calculateLeftAngle(short left, short center) {
 		double x = DistanceMeasurementProvider.SENSOR_DISTANCE + Math.sin(DistanceMeasurementProvider.SENSOR_ANGLE) * left;
 		double y = Math.cos(DistanceMeasurementProvider.SENSOR_ANGLE) * left - center;
 		return Math.acos(y / (Math.sqrt(y * y + x * x))) - Math.PI / 2;
 	}
 
-	private double calculateRightAngle(short right, short center) {
+	public static double calculateRightAngle(short right, short center) {
 		return -calculateLeftAngle(right, center);
 	}
 

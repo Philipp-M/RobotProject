@@ -126,14 +126,17 @@ public class RobotMovementManager {
 	/**
 	 * sends an interrupt request and waits until it was handled
 	 */
-	public synchronized void interruptRequestBlocking() {
+	public void interruptRequestBlocking() {
 		interruptRequest();
-		synchronized (commandLoopThread) {
+		while(isInterrupted()) {
 			try {
-				commandLoopThread.wait();
+				Thread.sleep(5);
 			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 		}
+		
 	}
 
 	/**
@@ -166,7 +169,7 @@ public class RobotMovementManager {
 					synchronized (RobotMovementManager.getInstance()) {
 						if (isInterrupted() && currentCommand == null) {
 							interruptRequest = false;
-							notifyAll();
+							
 							for (ChangeEventListener cEL : changeEventListeners)
 								cEL.onFinishedExecution();
 						} else if (isInterrupted() && currentCommand != null) {
@@ -175,7 +178,8 @@ public class RobotMovementManager {
 							OdometryManager.getInstance().stop();
 							interruptRequest = false;
 							currentCommand = null;
-							notifyAll();
+							commandQueue.clear();
+							
 						} else if (currentCommand == null && !commandQueue.isEmpty()) {
 							currentCommand = new Thread(commandQueue.remove());
 							currentCommand.start();
