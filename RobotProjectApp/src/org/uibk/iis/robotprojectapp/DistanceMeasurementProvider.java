@@ -32,23 +32,27 @@ public class DistanceMeasurementProvider {
 	}
 
 	/**
-	 * just a structure that holds every necessary information that a listener
-	 * requires...
+	 * just a structure that holds every necessary information that a listener requires...
 	 */
 	private static class ChangeEventListenerContainer {
 		public ChangeEventListener changeEventListener;
 		public short minDiffForEvent;
+		public long cooldownThreshold;
+		public int cooldownThresholdCounter;
 		public short threshold;
 		public boolean belowThreshold;
 		private short lastLeftSensorValue;
 		private short lastRightSensorValue;
 		private short lastCenterSensorValue;
 
-		public ChangeEventListenerContainer(ChangeEventListener changeEventListener, short minDiffForEvent, short threshold) {
+		public ChangeEventListenerContainer(ChangeEventListener changeEventListener, short minDiffForEvent, short threshold,
+				long cooldownThreshold) {
 			this.changeEventListener = changeEventListener;
 			this.minDiffForEvent = minDiffForEvent;
 			this.threshold = threshold;
 			this.belowThreshold = false;
+			this.cooldownThreshold = cooldownThreshold;
+			this.cooldownThresholdCounter = 0;
 		}
 	}
 
@@ -73,14 +77,11 @@ public class DistanceMeasurementProvider {
 	}
 
 	/**
-	 * this method has to be called first otherwise the other (listener) methods
-	 * won't work
+	 * this method has to be called first otherwise the other (listener) methods won't work
 	 * 
 	 * @param deltaTime
-	 *            time between measurements has to be bigger than 115ms because
-	 *            the robot is to slow to answer(or to be exact it just sends
-	 *            quite much overhead(string instead of binary). A fix which has
-	 *            to be flashed on the robot interface is already available
+	 *            time between measurements has to be bigger than 115ms because the robot is to slow to answer(or to be exact it just sends
+	 *            quite much overhead(string instead of binary). A fix which has to be flashed on the robot interface is already available
 	 *            which reduces this delay to 35ms(BINARY_READING))
 	 */
 	public void init(long deltaTime) {
@@ -120,14 +121,12 @@ public class DistanceMeasurementProvider {
 	 * @param changeEventListener
 	 *            the listener to register
 	 * @param threshold
-	 *            below this value a belowThreshold event is sent, used for
-	 *            example as stopping detection
+	 *            below this value a belowThreshold event is sent, used for example as stopping detection
 	 * @param minDiffForEvent
-	 *            minimum difference('delta'-length) between two measurements to
-	 *            trigger an event to the listener
+	 *            minimum difference('delta'-length) between two measurements to trigger an event to the listener
 	 */
-	public void registerListener(ChangeEventListener changeEventListener, short minDiffForEvent, short threshold) {
-		changeEventListeners.add(new ChangeEventListenerContainer(changeEventListener, minDiffForEvent, threshold));
+	public void registerListener(ChangeEventListener changeEventListener, short minDiffForEvent, short threshold, long cooldownThreshold) {
+		changeEventListeners.add(new ChangeEventListenerContainer(changeEventListener, minDiffForEvent, threshold, cooldownThreshold));
 	}
 
 	/**
@@ -143,8 +142,7 @@ public class DistanceMeasurementProvider {
 	}
 
 	/**
-	 * needed for the text based reply(who ever came to the idea to send text
-	 * instead of binary over such a slow connection...)
+	 * needed for the text based reply(who ever came to the idea to send text instead of binary over such a slow connection...)
 	 * 
 	 * @param sensorString
 	 *            the string to parse
@@ -184,29 +182,32 @@ public class DistanceMeasurementProvider {
 	}
 
 	/**
-	 * The timer task that updates the measurements and sends events to the
-	 * listeners
+	 * The timer task that updates the measurements and sends events to the listeners
 	 */
 	private class MeasurementTimerTask extends TimerTask {
 		@Override
 		public void run() {
 			if (!binaryReading) {
 				try {
-					sensorStringParser(ComDriver.getInstance().comReadWrite(new byte[] { 'q', '\r', '\n' }));
+					if (ComDriver.getInstance().isConnected()) {
+						sensorStringParser(ComDriver.getInstance().comReadWrite(new byte[] { 'q', '\r', '\n' }));
+					}
 				} catch (IllegalArgumentException e) {
 					e.printStackTrace();
 				}
 			} else {
-				ArrayList<Byte> sensorData = ComDriver.getInstance().comReadBinWrite(new byte[] { 'p', '\r', '\b' });
-				leftSensorValue = sensorData.get(LEFT_SENSOR);
-				rightSensorValue = sensorData.get(RIGHT_SENSOR);
-				centerSensorValue = sensorData.get(CENTER_SENSOR);
-				if (leftSensorValue == -1)
-					leftSensorValue = 255;
-				if (rightSensorValue == -1)
-					rightSensorValue = 255;
-				if (centerSensorValue == -1)
-					centerSensorValue = 255;
+				if (ComDriver.getInstance().isConnected()) {
+					ArrayList<Byte> sensorData = ComDriver.getInstance().comReadBinWrite(new byte[] { 'p', '\r', '\b' });
+					leftSensorValue = sensorData.get(LEFT_SENSOR);
+					rightSensorValue = sensorData.get(RIGHT_SENSOR);
+					centerSensorValue = sensorData.get(CENTER_SENSOR);
+					if (leftSensorValue == -1)
+						leftSensorValue = 255;
+					if (rightSensorValue == -1)
+						rightSensorValue = 255;
+					if (centerSensorValue == -1)
+						centerSensorValue = 255;
+				}
 			}
 			for (ChangeEventListenerContainer cEListenCont : changeEventListeners) {
 				if (Math.abs(cEListenCont.lastLeftSensorValue - leftSensorValue) >= cEListenCont.minDiffForEvent
@@ -217,14 +218,16 @@ public class DistanceMeasurementProvider {
 					cEListenCont.lastCenterSensorValue = centerSensorValue;
 					cEListenCont.changeEventListener.onDistanceChanged(leftSensorValue, centerSensorValue, rightSensorValue);
 				}
-
+				cEListenCont.cooldownThresholdCounter++;
 				if (!cEListenCont.belowThreshold
 						&& (leftSensorValue <= cEListenCont.threshold || rightSensorValue <= cEListenCont.threshold || centerSensorValue <= cEListenCont.threshold)) {
 					cEListenCont.belowThreshold = true;
 					cEListenCont.changeEventListener.onDistanceBelowThreshold(leftSensorValue, centerSensorValue, rightSensorValue);
+					cEListenCont.cooldownThresholdCounter = 0;
 				}
 
-				if (leftSensorValue > threshold && rightSensorValue > cEListenCont.threshold && centerSensorValue <= cEListenCont.threshold)
+				if (leftSensorValue > threshold && rightSensorValue > cEListenCont.threshold && centerSensorValue > cEListenCont.threshold
+						&& cEListenCont.cooldownThresholdCounter * deltaTime > cEListenCont.cooldownThreshold)
 					cEListenCont.belowThreshold = false;
 			}
 		}
