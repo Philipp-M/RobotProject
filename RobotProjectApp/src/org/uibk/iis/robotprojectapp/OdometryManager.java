@@ -1,6 +1,7 @@
 package org.uibk.iis.robotprojectapp;
 
 import android.content.Context;
+import android.util.Log;
 
 public class OdometryManager {
 	static final double CALIBRATION_FACTOR_LEFT = 1;
@@ -267,7 +268,7 @@ public class OdometryManager {
 		double xDiff = x - pos.x;
 		double yDiff = y - pos.y;
 		double distance = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
-		if (distance > 0.2) {
+		if (distance > 2) {
 			double tmpTheta = Math.asin(yDiff / distance);
 			double tmpTheta1;
 			double tmpTheta2;
@@ -323,7 +324,7 @@ public class OdometryManager {
 
 		public boolean equals(Position pos, double epsilon) {
 			if (this.x + epsilon > pos.x && this.x - epsilon < pos.x && this.x + epsilon > pos.y && this.y - epsilon < pos.y
-					&& this.theta + epsilon < pos.theta && this.theta - epsilon > pos.theta)
+					&& this.theta + epsilon*0.1 > pos.theta && this.theta - epsilon*0.1 < pos.theta)
 				return true;
 			return false;
 		}
@@ -351,8 +352,7 @@ public class OdometryManager {
 			if (getClass() != obj.getClass())
 				return false;
 			Position other = (Position) obj;
-			equals(other, 0.5);
-			return true;
+			return equals(other, 0.5);
 		}
 	}
 }
