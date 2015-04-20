@@ -1,7 +1,5 @@
 package org.uibk.iis.robotprojectapp;
 
-import java.util.ArrayList;
-
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;

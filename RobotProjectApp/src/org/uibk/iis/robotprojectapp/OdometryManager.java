@@ -52,7 +52,7 @@ public class OdometryManager {
 			break;
 		}
 		time = Math.abs(theta) * CalibrationTask.ROBOT_AXLE_LENGTH / robotSpeedCmL;
-		if (time > 0.03) {
+		if (time > 0.03 && (ComDriver.getInstance().isConnected())) {
 			if (rightTurn)
 				ComDriver.getInstance().comReadWrite(
 						new byte[] { 'i', (byte) Math.round(robotSpeed / 2.0),
@@ -88,7 +88,8 @@ public class OdometryManager {
 	 */
 	public synchronized boolean pivotAngle(double theta, CalibrationTask.Type speed) {
 		boolean retVal = pivotAngleNonStopping(theta, speed);
-		ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
+		if (ComDriver.getInstance().isConnected())
+			ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
 		return retVal;
 	}
 
@@ -118,7 +119,7 @@ public class OdometryManager {
 		}
 		if (leftWheel) {
 			time = Math.abs(theta) * CalibrationTask.ROBOT_AXLE_LENGTH / robotSpeedCmL;
-			if (time > 0.03) {
+			if (time > 0.03 && (ComDriver.getInstance().isConnected())) {
 				ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) ((reverse ? -1 : 1) * robotSpeed), (byte) 0, '\r', '\n' });
 				StopWatch sw = new StopWatch();
 				sw.start();
@@ -141,7 +142,7 @@ public class OdometryManager {
 			}
 		} else {
 			time = Math.abs(theta) * CalibrationTask.ROBOT_AXLE_LENGTH / robotSpeedCmR;
-			if (time > 0.03) {
+			if (time > 0.03 && (ComDriver.getInstance().isConnected())) {
 				ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) ((reverse ? -1 : 1) * robotSpeed), '\r', '\n' });
 				StopWatch sw = new StopWatch();
 				sw.start();
@@ -205,7 +206,7 @@ public class OdometryManager {
 		}
 		time = distance / robotSpeedCmL;
 		distance = reverse ? -distance : distance;
-		if (time > 0.03) {
+		if (time > 0.03 && (ComDriver.getInstance().isConnected())) {
 			if (!reverse)
 				ComDriver.getInstance().comReadWrite(
 						new byte[] { 'i', (byte) robotSpeed, (byte) (robotSpeed * robotSpeedCmL / robotSpeedCmR), '\r', '\n' });
@@ -238,15 +239,18 @@ public class OdometryManager {
 
 	public synchronized void driveForward(double distance, CalibrationTask.Type speed) {
 		driveForwardNonStopping(distance, speed, false);
+		if(ComDriver.getInstance().isConnected())
 		ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
 	}
 
 	public synchronized void driveBackwards(double distance, CalibrationTask.Type speed) {
 		driveForwardNonStopping(distance, speed, true);
+		if(ComDriver.getInstance().isConnected())
 		ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
 	}
 
 	public synchronized void stop() {
+		if(ComDriver.getInstance().isConnected())
 		ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
 	}
 
@@ -324,7 +328,7 @@ public class OdometryManager {
 
 		public boolean equals(Position pos, double epsilon) {
 			if (this.x + epsilon > pos.x && this.x - epsilon < pos.x && this.x + epsilon > pos.y && this.y - epsilon < pos.y
-					&& this.theta + epsilon*0.1 > pos.theta && this.theta - epsilon*0.1 < pos.theta)
+					&& this.theta + epsilon * 0.1 > pos.theta && this.theta - epsilon * 0.1 < pos.theta)
 				return true;
 			return false;
 		}

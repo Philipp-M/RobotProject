@@ -55,6 +55,7 @@ public class SimpleSimpleObstacleAvoidance implements DistanceMeasurementProvide
 				if (changeEventListener != null)
 					changeEventListener.onFoundTarget();
 				DistanceMeasurementProvider.getInstance().unregisterListener(this);
+				RobotMovementManager.getInstance().unregisterListener(this);
 
 			} else {
 				RobotMovementManager.getInstance().addCommand(
