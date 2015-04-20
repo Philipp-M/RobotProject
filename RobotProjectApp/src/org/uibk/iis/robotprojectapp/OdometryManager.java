@@ -82,8 +82,7 @@ public class OdometryManager {
 	 * @param theta
 	 *            the delta angle to turn around
 	 * @param speed
-	 *            can either be SLOW, MEDM or FAST, every other value will be
-	 *            interpreted as SLOW
+	 *            can either be SLOW, MEDM or FAST, every other value will be interpreted as SLOW
 	 * @throws InterruptedException
 	 */
 	public synchronized boolean pivotAngle(double theta, CalibrationTask.Type speed) {
@@ -129,18 +128,20 @@ public class OdometryManager {
 					return false;
 				} finally {
 					// update current angle and position
-					pos.x += (reverse ? -1 : 1) * (-CalibrationTask.ROBOT_AXLE_LENGTH / 2.0
-							* (Math.sin(-robotSpeedCmL * time / CalibrationTask.ROBOT_AXLE_LENGTH + pos.theta) - Math.sin(pos.theta)));
-					pos.y += (reverse ? -1 : 1) * (CalibrationTask.ROBOT_AXLE_LENGTH / 2.0
-							* (Math.cos(-robotSpeedCmL * time / CalibrationTask.ROBOT_AXLE_LENGTH + pos.theta) - Math.cos(pos.theta)));
-					pos.theta += (reverse ? -1 : 1) * (-robotSpeedCmL * time / CalibrationTask.ROBOT_AXLE_LENGTH);
+					pos.x += (reverse ? 1 : -1)
+							* (-CalibrationTask.ROBOT_AXLE_LENGTH / 2.0 * (Math.sin(-robotSpeedCmL * time
+									/ CalibrationTask.ROBOT_AXLE_LENGTH + pos.theta) - Math.sin(pos.theta)));
+					pos.y += (reverse ? 1 : -1)
+							* (CalibrationTask.ROBOT_AXLE_LENGTH / 2.0 * (Math.cos(-robotSpeedCmL * time
+									/ CalibrationTask.ROBOT_AXLE_LENGTH + pos.theta) - Math.cos(pos.theta)));
+					pos.theta += (reverse ? 1 : -1) * (-robotSpeedCmL * time / CalibrationTask.ROBOT_AXLE_LENGTH);
 				}
 
 			}
 		} else {
 			time = Math.abs(theta) * CalibrationTask.ROBOT_AXLE_LENGTH / robotSpeedCmR;
 			if (time > 0.03) {
-				ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) robotSpeed, '\r', '\n' });
+				ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) ((reverse ? -1 : 1) * robotSpeed), '\r', '\n' });
 				StopWatch sw = new StopWatch();
 				sw.start();
 				try {
@@ -150,11 +151,12 @@ public class OdometryManager {
 					return false;
 				} finally {
 					// update current angle and position
-					pos.x += +CalibrationTask.ROBOT_AXLE_LENGTH / 2.0
+					pos.x += (reverse ? 1 : -1) * CalibrationTask.ROBOT_AXLE_LENGTH / 2.0
 							* (Math.sin(robotSpeedCmR * time / CalibrationTask.ROBOT_AXLE_LENGTH + pos.theta) - Math.sin(pos.theta));
-					pos.y += -CalibrationTask.ROBOT_AXLE_LENGTH / 2.0
-							* (Math.cos(robotSpeedCmR * time / CalibrationTask.ROBOT_AXLE_LENGTH + pos.theta) - Math.cos(pos.theta));
-					pos.theta += -robotSpeedCmL * time / CalibrationTask.ROBOT_AXLE_LENGTH;
+					pos.y += (reverse ? 1 : -1)
+							* (-CalibrationTask.ROBOT_AXLE_LENGTH / 2.0 * (Math.cos(robotSpeedCmR * time
+									/ CalibrationTask.ROBOT_AXLE_LENGTH + pos.theta) - Math.cos(pos.theta)));
+					pos.theta += (reverse ? 1 : -1) * (-robotSpeedCmL * time / CalibrationTask.ROBOT_AXLE_LENGTH);
 				}
 			}
 		}
@@ -162,14 +164,12 @@ public class OdometryManager {
 	}
 
 	/**
-	 * turns around an angle(one wheel, so it changes the base position -
-	 * caution !)
+	 * turns around an angle(one wheel, so it changes the base position - caution !)
 	 * 
 	 * @param theta
 	 *            the delta value to turn around
 	 * @param speed
-	 *            can either be SLOW, MEDM or FAST, every other value will be
-	 *            interpreted as SLOW
+	 *            can either be SLOW, MEDM or FAST, every other value will be interpreted as SLOW
 	 * @throws InterruptedException
 	 */
 	public synchronized boolean turnAngle(double theta, CalibrationTask.Type speed, boolean reverse) {
@@ -177,6 +177,7 @@ public class OdometryManager {
 		ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
 		return retVal;
 	}
+
 	public synchronized boolean driveForwardNonStopping(double distance, CalibrationTask.Type speed, boolean reverse) {
 		double robotSpeed;
 		double robotSpeedCmL;
@@ -204,9 +205,9 @@ public class OdometryManager {
 		time = distance / robotSpeedCmL;
 		distance = reverse ? -distance : distance;
 		if (time > 0.03) {
-			if(!reverse)
+			if (!reverse)
 				ComDriver.getInstance().comReadWrite(
-					new byte[] { 'i', (byte) robotSpeed, (byte) (robotSpeed * robotSpeedCmL / robotSpeedCmR), '\r', '\n' });
+						new byte[] { 'i', (byte) robotSpeed, (byte) (robotSpeed * robotSpeedCmL / robotSpeedCmR), '\r', '\n' });
 			else
 				ComDriver.getInstance().comReadWrite(
 						new byte[] { 'i', (byte) -robotSpeed, (byte) -(robotSpeed * robotSpeedCmL / robotSpeedCmR), '\r', '\n' });
@@ -225,21 +226,25 @@ public class OdometryManager {
 		}
 		return true;
 	}
+
 	public synchronized boolean driveForwardNonStopping(double distance, CalibrationTask.Type speed) {
 		return driveForwardNonStopping(distance, speed, false);
 	}
+
 	public synchronized boolean driveBackwardsNonStopping(double distance, CalibrationTask.Type speed) {
 		return driveForwardNonStopping(distance, speed, true);
 	}
+
 	public synchronized void driveForward(double distance, CalibrationTask.Type speed) {
 		driveForwardNonStopping(distance, speed, false);
 		ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
 	}
+
 	public synchronized void driveBackwards(double distance, CalibrationTask.Type speed) {
 		driveForwardNonStopping(distance, speed, true);
 		ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
 	}
-	
+
 	public synchronized void stop() {
 		ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
 	}
@@ -254,8 +259,7 @@ public class OdometryManager {
 	 * @param newTheta
 	 *            the new absolute angle (counterclockwise) based on the x-axis
 	 * @param speed
-	 *            can either be SLOW, MEDM or FAST, every other value will be
-	 *            interpreted as SLOW
+	 *            can either be SLOW, MEDM or FAST, every other value will be interpreted as SLOW
 	 * @throws InterruptedException
 	 * @return if the execution went well 'true' else false
 	 */
@@ -264,8 +268,16 @@ public class OdometryManager {
 		double yDiff = y - pos.y;
 		double distance = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
 		if (distance > 0.2) {
-			double tmpTheta1 = (Math.asin(yDiff / distance) - pos.theta);
-			double tmpTheta2 = (newTheta - Math.asin(yDiff / distance));
+			double tmpTheta = Math.asin(yDiff / distance);
+			double tmpTheta1;
+			double tmpTheta2;
+			if (xDiff < 0 && yDiff > 0)
+				tmpTheta = Math.toRadians(180) - tmpTheta;
+			if (xDiff < 0 && yDiff < 0)
+				tmpTheta = -Math.toRadians(180) - tmpTheta;
+			tmpTheta1 = tmpTheta - pos.theta;
+			tmpTheta2 = newTheta - tmpTheta;
+
 			// following is possible due to "short-circuit-evaluation"
 			return (!Thread.interrupted() && pivotAngleNonStopping(tmpTheta1, speed) && !Thread.interrupted()
 					&& driveForwardNonStopping(distance, speed) && !Thread.interrupted() && pivotAngle(tmpTheta2, speed));
@@ -307,6 +319,40 @@ public class OdometryManager {
 
 		public void setTheta(double theta) {
 			this.theta = theta;
+		}
+
+		public boolean equals(Position pos, double epsilon) {
+			if (this.x + epsilon > pos.x && this.x - epsilon < pos.x && this.x + epsilon > pos.y && this.y - epsilon < pos.y
+					&& this.theta + epsilon < pos.theta && this.theta - epsilon > pos.theta)
+				return true;
+			return false;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			long temp;
+			temp = Double.doubleToLongBits(theta);
+			result = prime * result + (int) (temp ^ (temp >>> 32));
+			temp = Double.doubleToLongBits(x);
+			result = prime * result + (int) (temp ^ (temp >>> 32));
+			temp = Double.doubleToLongBits(y);
+			result = prime * result + (int) (temp ^ (temp >>> 32));
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Position other = (Position) obj;
+			equals(other, 0.5);
+			return true;
 		}
 	}
 }

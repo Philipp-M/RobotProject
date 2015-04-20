@@ -67,6 +67,8 @@ public class RobotMainActivity extends ActionBarActivity implements ActionBar.Ta
 		ComDriver.getInstance().init(getBaseContext(), 9600);
 		
 		OdometryManager.getInstance().init(this, 0, 0, 0);
+		DistanceMeasurementProvider.getInstance().init(250);
+		DistanceMeasurementProvider.getInstance().start();
 		RobotMovementManager.getInstance().start();
 		
 		if (ComDriver.getInstance().isConnected()
