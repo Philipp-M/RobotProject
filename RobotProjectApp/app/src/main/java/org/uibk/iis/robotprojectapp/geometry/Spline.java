@@ -71,25 +71,25 @@ public class Spline {
 	}
 
 	public static List<Point2D> subdividePoints(List<Point2D> points, int subdivisions) {
-		if(points.size() < 3)
+		if (points.size() < 3)
 			return null;
-        ArrayList<Point2D> subdividedPoints = new ArrayList<Point2D>(((points.size()-1) * subdivisions) + 1);
+		ArrayList<Point2D> subdividedPoints = new ArrayList<Point2D>(((points.size() - 1) * subdivisions) + 1);
 
-        double increments = 1.0 / (double)subdivisions;
+		double increments = 1.0 / (double) subdivisions;
 
-        for (int i = 0; i < points.size()-1; i++) {
-            Point2D p0 = i == 0 ? points.get(i) : points.get(i-1);
-            Point2D p1 = points.get(i);
-            Point2D p2 = points.get(i+1);
-            Point2D p3 = (i+2 == points.size()) ? points.get(i+1) : points.get(i+2);
+		for (int i = 0; i < points.size() - 1; i++) {
+			Point2D p0 = i == 0 ? points.get(i) : points.get(i - 1);
+			Point2D p1 = points.get(i);
+			Point2D p2 = points.get(i + 1);
+			Point2D p3 = (i + 2 == points.size()) ? points.get(i + 1) : points.get(i + 2);
 
-            CatmullRomSpline2D crs = new CatmullRomSpline2D(p0, p1, p2, p3);
+			CatmullRomSpline2D crs = new CatmullRomSpline2D(p0, p1, p2, p3);
 
-            for (int j = 0; j <= subdivisions; j++) {
-                subdividedPoints.add(crs.interpolate(j * increments));
-            }
-        }
+			for (int j = 0; j <= subdivisions; j++) {
+				subdividedPoints.add(crs.interpolate(j * increments));
+			}
+		}
 
-        return subdividedPoints;
-    }
+		return subdividedPoints;
+	}
 }

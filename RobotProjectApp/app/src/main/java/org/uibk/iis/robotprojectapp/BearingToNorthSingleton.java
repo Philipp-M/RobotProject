@@ -1,6 +1,7 @@
 package org.uibk.iis.robotprojectapp;
 
 import org.uibk.iis.robotprojectapp.bearing.BearingToNorthProvider;
+
 import android.content.Context;
 
 public class BearingToNorthSingleton {
@@ -22,22 +23,22 @@ public class BearingToNorthSingleton {
 
 	// this method has to be called first otherwise the other methods won't work
 	public void init(Context context) {
-		bearingToNorthProvider = new BearingToNorthProvider(context,17,0.5,50, false);
+		bearingToNorthProvider = new BearingToNorthProvider(context, 17, 0.5, 50, false);
 	}
 
 	public double getBearing() {
-		if(bearingToNorthProvider != null)
+		if (bearingToNorthProvider != null)
 			return bearingToNorthProvider.getBearing();
 		return 0;
 	}
 
 	public void start() {
-		if(bearingToNorthProvider != null)
+		if (bearingToNorthProvider != null)
 			bearingToNorthProvider.start();
 	}
 
 	public void stop() {
-		if(bearingToNorthProvider != null)
+		if (bearingToNorthProvider != null)
 			bearingToNorthProvider.stop();
 	}
 	// if more methods are needed just implement them like above...

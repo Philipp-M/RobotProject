@@ -42,9 +42,9 @@ public class PreferencesActivity extends PreferenceActivity {
 
 	@Override
 	protected boolean isValidFragment(String fragmentName) {
-		if(CalibrationFragment.class.getName().equals(fragmentName))
+		if (CalibrationFragment.class.getName().equals(fragmentName))
 			return true;
-		else if(CommonFragment.class.getName().equals(fragmentName))
+		else if (CommonFragment.class.getName().equals(fragmentName))
 			return true;
 		return false;
 	}
@@ -60,15 +60,16 @@ public class PreferencesActivity extends PreferenceActivity {
 
 		}
 	}
+
 	public static class CommonFragment extends PreferenceFragment {
-		
+
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
-			
+
 			// Load the preferences from an XML resource
 			addPreferencesFromResource(R.xml.preferences_common);
-			
+
 		}
 	}
 }

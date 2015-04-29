@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.hardware.usb.UsbManager;
+
 import jp.ksksue.driver.serial.FTDriver;
 
 //			throw exceptions if it isn't initialized
@@ -29,8 +30,8 @@ public class ComDriver {
 	private FTDriver com;
 
 	/**
-	 * @todo should throw an exception
 	 * @param baudrate
+	 * @todo should throw an exception
 	 */
 	public void connect(int baudrate) {
 		// TODO implement permission request
@@ -61,9 +62,9 @@ public class ComDriver {
 
 	/**
 	 * transfers given bytes via the serial connection.
-	 * 
-	 * @todo should throw an exception
+	 *
 	 * @param data
+	 * @todo should throw an exception
 	 */
 	public void comWrite(byte[] data) {
 		synchronized (this) {
@@ -78,7 +79,7 @@ public class ComDriver {
 	 * issued 3 times at minimum and continuously as long as there are bytes to
 	 * read from the buffer. Note that this function does not block, it might
 	 * return an empty string if no bytes have been read at all.
-	 * 
+	 *
 	 * @return buffer content as string
 	 */
 	public String comRead() {
@@ -103,7 +104,7 @@ public class ComDriver {
 	 * issued 3 times at minimum and continuously as long as there are bytes to
 	 * read from the buffer. Note that this function does not block, it might
 	 * return an empty string if no bytes have been read at all.
-	 * 
+	 *
 	 * @return buffer content as binary char array
 	 */
 	public ArrayList<Byte> comReadBin() {
@@ -127,9 +128,8 @@ public class ComDriver {
 	/**
 	 * write data to serial interface, don't(!) wait(not needed since the
 	 * FTDriver waits) and read answer.
-	 * 
-	 * @param data
-	 *            to write
+	 *
+	 * @param data to write
 	 * @return answer from serial interface
 	 */
 	public String comReadWrite(byte[] data) {

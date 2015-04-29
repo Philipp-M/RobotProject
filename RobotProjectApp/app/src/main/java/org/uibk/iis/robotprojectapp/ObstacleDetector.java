@@ -12,7 +12,7 @@ public class ObstacleDetector implements DistanceMeasurementProvider.ChangeEvent
 		void onObstacleDetected(short minDistance, double angleL, double angleR);
 
 		void onObstacleDetected(ObstacleDetector.Detection sensor, short minDistance);
-		
+
 		void onObstacleDisappeared();
 	}
 
@@ -31,9 +31,11 @@ public class ObstacleDetector implements DistanceMeasurementProvider.ChangeEvent
 		this.changeEventListener = changeEventListener;
 		lastDetection = Detection.NONE;
 	}
+
 	public void start() {
 		DistanceMeasurementProvider.getInstance().registerListener(this, (short) 1, minThreshold, 1000);
 	}
+
 	public void stop() {
 		DistanceMeasurementProvider.getInstance().unregisterListener(this);
 	}
@@ -75,18 +77,15 @@ public class ObstacleDetector implements DistanceMeasurementProvider.ChangeEvent
 				&& center < maxThreshold && lastDetection != Detection.BOTH) {
 			changeEventListener.onObstacleDetected(minDistance, calculateLeftAngle(left, center), calculateRightAngle(right, center));
 			lastDetection = Detection.BOTH;
-		}
-		else if (left > minThreshold && center > minThreshold && left < maxThreshold && center < maxThreshold
+		} else if (left > minThreshold && center > minThreshold && left < maxThreshold && center < maxThreshold
 				&& lastDetection != Detection.LEFT_ANGLE) {
 			changeEventListener.onLeftObstacleDetected(minDistance, calculateLeftAngle(left, center));
 			lastDetection = Detection.LEFT_ANGLE;
-		}
-		else if (right > minThreshold && center > minThreshold && right < maxThreshold && center < maxThreshold
+		} else if (right > minThreshold && center > minThreshold && right < maxThreshold && center < maxThreshold
 				&& lastDetection != Detection.RIGHT_ANGLE) {
 			changeEventListener.onRightObstacleDetected(minDistance, calculateRightAngle(right, center));
 			lastDetection = Detection.RIGHT_ANGLE;
-		}
-		else if ((left > minThreshold && left < maxThreshold) || (right > minThreshold && right < maxThreshold)
+		} else if ((left > minThreshold && left < maxThreshold) || (right > minThreshold && right < maxThreshold)
 				|| (center > minThreshold && center < maxThreshold)) {
 			ObstacleDetector.Detection sensor;
 			if (left <= right) {
@@ -104,14 +103,14 @@ public class ObstacleDetector implements DistanceMeasurementProvider.ChangeEvent
 					|| (sensor == ObstacleDetector.Detection.RIGHT_SENS && lastDetection != Detection.RIGHT_SENS)
 					|| (sensor == ObstacleDetector.Detection.CENTER_SENS && lastDetection != Detection.CENTER_SENS)) {
 				changeEventListener.onObstacleDetected(sensor, minDistance);
-				if(sensor == ObstacleDetector.Detection.RIGHT_SENS)
+				if (sensor == ObstacleDetector.Detection.RIGHT_SENS)
 					lastDetection = Detection.LEFT_SENS;
-				else if(sensor == ObstacleDetector.Detection.RIGHT_SENS)
+				else if (sensor == ObstacleDetector.Detection.RIGHT_SENS)
 					lastDetection = Detection.RIGHT_SENS;
 				else
 					lastDetection = Detection.CENTER_SENS;
 			}
-		} else if(left > maxThreshold && right > maxThreshold && center > maxThreshold && lastDetection != Detection.NONE) {
+		} else if (left > maxThreshold && right > maxThreshold && center > maxThreshold && lastDetection != Detection.NONE) {
 			changeEventListener.onObstacleDisappeared();
 			lastDetection = Detection.NONE;
 		}

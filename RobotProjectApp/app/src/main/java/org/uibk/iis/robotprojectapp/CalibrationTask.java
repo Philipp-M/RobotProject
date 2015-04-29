@@ -42,7 +42,7 @@ public class CalibrationTask implements Runnable {
 		public final int FAST_VAL;
 
 		public Data(double LEFT_WHEEL_SLOW, double RIGHT_WHEEL_SLOW, double LEFT_WHEEL_MEDM, double RIGHT_WHEEL_MEDM,
-				double LEFT_WHEEL_FAST, double RIGHT_WHEEL_FAST, int SLOW_VAL, int MEDM_VAL, int FAST_VAL) {
+		            double LEFT_WHEEL_FAST, double RIGHT_WHEEL_FAST, int SLOW_VAL, int MEDM_VAL, int FAST_VAL) {
 			this.LEFT_WHEEL_SLOW = LEFT_WHEEL_SLOW;
 			this.RIGHT_WHEEL_SLOW = RIGHT_WHEEL_SLOW;
 			this.LEFT_WHEEL_MEDM = LEFT_WHEEL_MEDM;
@@ -72,11 +72,9 @@ public class CalibrationTask implements Runnable {
 		 * ---not needed anymore--- multiplies two Calibration datas, The speed
 		 * values have to be equal in both datas. An IllegalArgumentException is
 		 * thrown otherwise
-		 * 
-		 * @param d1
-		 *            first data
-		 * @param d2
-		 *            second data
+		 *
+		 * @param d1 first data
+		 * @param d2 second data
 		 * @return the product of both
 		 */
 		public static Data multiply(Data d1, Data d2) throws IllegalArgumentException {
@@ -91,11 +89,9 @@ public class CalibrationTask implements Runnable {
 		/**
 		 * adds two Calibration datas, The speed values have to be equal in both
 		 * datas. An IllegalArgumentException is thrown otherwise
-		 * 
-		 * @param d1
-		 *            first data
-		 * @param d2
-		 *            second data
+		 *
+		 * @param d1 first data
+		 * @param d2 second data
 		 * @return the product of both
 		 */
 		public static Data add(Data d1, Data d2) throws IllegalArgumentException {
@@ -132,24 +128,16 @@ public class CalibrationTask implements Runnable {
 	private Activity activity;
 
 	/**
-	 * 
-	 * @param activity
-	 *            the main Activity which has the UI Thread
-	 * @param callbackHandler
-	 *            the callback handler which is notified about the progress that
-	 *            is made during calibration
-	 * @param time
-	 *            the time in which every single calibration type is made (the
-	 *            single types like LEFT_WHEEL_SLOW, RIGHT_WHEEL_MEDM or
-	 *            LEFT_WHEEL_FAST)
-	 * @param slowVal
-	 *            the slow velocity
-	 * @param medmVal
-	 *            the medium velocity
-	 * @param fastVal
-	 *            the fast velocity
-	 * @param type
-	 *            the type of calibration
+	 * @param activity        the main Activity which has the UI Thread
+	 * @param callbackHandler the callback handler which is notified about the progress that
+	 *                        is made during calibration
+	 * @param time            the time in which every single calibration type is made (the
+	 *                        single types like LEFT_WHEEL_SLOW, RIGHT_WHEEL_MEDM or
+	 *                        LEFT_WHEEL_FAST)
+	 * @param slowVal         the slow velocity
+	 * @param medmVal         the medium velocity
+	 * @param fastVal         the fast velocity
+	 * @param type            the type of calibration
 	 */
 	public CalibrationTask(Activity activity, Callback callbackHandler, long time, int slowVal, int medmVal, int fastVal, Type type) {
 		this.time = time;
@@ -213,97 +201,95 @@ public class CalibrationTask implements Runnable {
 
 	/**
 	 * calculates the estimated time for the whole calibration
-	 * 
+	 *
 	 * @return the estimated time
 	 */
 	private long calculateEstimatedTime() {
 		switch (type) {
-		case LEFT_WHEEL_SLOW:
-		case RIGHT_WHEEL_SLOW:
-		case LEFT_WHEEL_MEDM:
-		case RIGHT_WHEEL_MEDM:
-		case LEFT_WHEEL_FAST:
-		case RIGHT_WHEEL_FAST:
-			return time + 2 * BEARING_MEASURING_BREAK; // extra time needed
-															// for measurement
-		case SLOW:
-		case MEDM:
-		case FAST:
-			return BEARING_MEASURING_BREAK + 2 * (time + BEARING_MEASURING_BREAK); // extra time
-																// needed for
-																// measurement
-		case ALL:
-		default:
-			return BEARING_MEASURING_BREAK + 6 * (time + BEARING_MEASURING_BREAK); // extra time
-																// needed for
-																// measurement
+			case LEFT_WHEEL_SLOW:
+			case RIGHT_WHEEL_SLOW:
+			case LEFT_WHEEL_MEDM:
+			case RIGHT_WHEEL_MEDM:
+			case LEFT_WHEEL_FAST:
+			case RIGHT_WHEEL_FAST:
+				return time + 2 * BEARING_MEASURING_BREAK; // extra time needed
+			// for measurement
+			case SLOW:
+			case MEDM:
+			case FAST:
+				return BEARING_MEASURING_BREAK + 2 * (time + BEARING_MEASURING_BREAK); // extra time
+			// needed for
+			// measurement
+			case ALL:
+			default:
+				return BEARING_MEASURING_BREAK + 6 * (time + BEARING_MEASURING_BREAK); // extra time
+			// needed for
+			// measurement
 		}
 	}
 
 	/**
 	 * starts the calibration for the given type
-	 * 
+	 *
 	 * @return the resulting calibration data
-	 * @throws InterruptedException
-	 *             is thrown when an interruption by mainly the host is made
-	 * @throws IllegalArgumentException
-	 *             is thrown when the bearing measurement went wrong(to large
-	 *             delta value between two measurements), happens mostly if the
-	 *             speed was set to high(>80)
+	 * @throws InterruptedException     is thrown when an interruption by mainly the host is made
+	 * @throws IllegalArgumentException is thrown when the bearing measurement went wrong(to large
+	 *                                  delta value between two measurements), happens mostly if the
+	 *                                  speed was set to high(>80)
 	 */
 	public Data calibrate() throws InterruptedException, IllegalArgumentException {
 		Data calLeftSlow, calRightSlow, calLeftMedm, calRightMedm, calLeftFast, calRightFast;
 		// wait a little for precalibration of the compass
 		Thread.sleep(BEARING_MEASURING_BREAK);
 		switch (type) {
-		case LEFT_WHEEL_SLOW:
-			return calibrateLeftSlow();
-		case RIGHT_WHEEL_SLOW:
-			return calibrateRightSlow();
-		case LEFT_WHEEL_MEDM:
-			return calibrateLeftMedm();
-		case RIGHT_WHEEL_MEDM:
-			return calibrateRightMedm();
-		case LEFT_WHEEL_FAST:
-			return calibrateLeftFast();
-		case RIGHT_WHEEL_FAST:
-			return calibrateRightFast();
-		case SLOW:
-			calLeftSlow = calibrateLeftSlow();
-			calRightSlow = calibrateRightSlow();
-			if (calLeftSlow == null || calRightSlow == null)
-				return null;
-			else
-				return Data.add(calLeftSlow, calRightSlow);
-		case MEDM:
-			calLeftMedm = calibrateLeftSlow();
-			calRightMedm = calibrateRightSlow();
-			if (calLeftMedm == null || calRightMedm == null)
-				return null;
-			else
-				return Data.add(calLeftMedm, calRightMedm);
-		case FAST:
-			calLeftFast = calibrateLeftFast();
-			calRightFast = calibrateRightFast();
-			if (calLeftFast == null || calRightFast == null)
-				return null;
-			else
-				return Data.add(calLeftFast, calRightFast);
-		case ALL:
-		default:
-			calLeftSlow = calibrateLeftSlow();
-			calRightSlow = calibrateRightSlow();
-			calLeftMedm = calibrateLeftMedm();
-			calRightMedm = calibrateRightMedm();
-			calLeftFast = calibrateLeftFast();
-			calRightFast = calibrateRightFast();
+			case LEFT_WHEEL_SLOW:
+				return calibrateLeftSlow();
+			case RIGHT_WHEEL_SLOW:
+				return calibrateRightSlow();
+			case LEFT_WHEEL_MEDM:
+				return calibrateLeftMedm();
+			case RIGHT_WHEEL_MEDM:
+				return calibrateRightMedm();
+			case LEFT_WHEEL_FAST:
+				return calibrateLeftFast();
+			case RIGHT_WHEEL_FAST:
+				return calibrateRightFast();
+			case SLOW:
+				calLeftSlow = calibrateLeftSlow();
+				calRightSlow = calibrateRightSlow();
+				if (calLeftSlow == null || calRightSlow == null)
+					return null;
+				else
+					return Data.add(calLeftSlow, calRightSlow);
+			case MEDM:
+				calLeftMedm = calibrateLeftSlow();
+				calRightMedm = calibrateRightSlow();
+				if (calLeftMedm == null || calRightMedm == null)
+					return null;
+				else
+					return Data.add(calLeftMedm, calRightMedm);
+			case FAST:
+				calLeftFast = calibrateLeftFast();
+				calRightFast = calibrateRightFast();
+				if (calLeftFast == null || calRightFast == null)
+					return null;
+				else
+					return Data.add(calLeftFast, calRightFast);
+			case ALL:
+			default:
+				calLeftSlow = calibrateLeftSlow();
+				calRightSlow = calibrateRightSlow();
+				calLeftMedm = calibrateLeftMedm();
+				calRightMedm = calibrateRightMedm();
+				calLeftFast = calibrateLeftFast();
+				calRightFast = calibrateRightFast();
 
-			if (calLeftSlow == null || calRightSlow == null || calLeftMedm == null || calRightMedm == null || calLeftFast == null
-					|| calRightFast == null)
-				return null;
-			else
-				return Data.add(Data.add(Data.add(calLeftSlow, calRightSlow), Data.add(calLeftMedm, calRightMedm)),
-						Data.add(calLeftFast, calRightFast));
+				if (calLeftSlow == null || calRightSlow == null || calLeftMedm == null || calRightMedm == null || calLeftFast == null
+						|| calRightFast == null)
+					return null;
+				else
+					return Data.add(Data.add(Data.add(calLeftSlow, calRightSlow), Data.add(calLeftMedm, calRightMedm)),
+							Data.add(calLeftFast, calRightFast));
 		}
 	}
 
@@ -311,14 +297,11 @@ public class CalibrationTask implements Runnable {
 	 * calculates the delta Value of two given angles, both angles have to lie
 	 * within the BEARING_THRESHOLD_ANGLE, otherwise incorrect results would
 	 * appear(the direction is not decidable)
-	 * 
-	 * @param lastAngle
-	 *            in degrees
-	 * @param newAngle
-	 *            in degrees
+	 *
+	 * @param lastAngle in degrees
+	 * @param newAngle  in degrees
 	 * @return the delta value between the two angles in degrees
-	 * @throws IllegalArgumentException
-	 *             is thrown when the BEARING_THRESHOLD_ANGLE is exceeded
+	 * @throws IllegalArgumentException is thrown when the BEARING_THRESHOLD_ANGLE is exceeded
 	 */
 	private double getDeltaAngle(double lastAngle, double newAngle) throws IllegalArgumentException {
 		double diff = newAngle - lastAngle;
@@ -351,7 +334,7 @@ public class CalibrationTask implements Runnable {
 		StopWatch sw = new StopWatch();
 		// start wheel(s) with given speed:
 		if (ComDriver.getInstance().isConnected())
-			ComDriver.getInstance().comReadWrite(new byte[] { 'i', leftVal, rightVal, '\r', '\n' });
+			ComDriver.getInstance().comReadWrite(new byte[]{'i', leftVal, rightVal, '\r', '\n'});
 		sw.start();
 		while (sw.getTime() < time) {
 			Thread.sleep(BEARING_SAMPLING_TIME);
@@ -370,7 +353,7 @@ public class CalibrationTask implements Runnable {
 		}
 		// stop wheel(s)
 		if (ComDriver.getInstance().isConnected())
-			ComDriver.getInstance().comReadWrite(new byte[] { 'i', 0, 0, '\r', '\n' });
+			ComDriver.getInstance().comReadWrite(new byte[]{'i', 0, 0, '\r', '\n'});
 		sw.stop();
 		// sleep a little bit to get a better final value
 		Thread.sleep(BEARING_MEASURING_BREAK);
@@ -381,12 +364,10 @@ public class CalibrationTask implements Runnable {
 
 	/**
 	 * calibrates the left wheel with slow velocity
-	 * 
+	 *
 	 * @return speed in centimeters per second
-	 * @throws InterruptedException
-	 *             is thrown when an interruption by mainly the host is made
-	 * @throws IllegalArgumentException
-	 *             is thrown when the BEARING_THRESHOLD_ANGLE is exceeded
+	 * @throws InterruptedException     is thrown when an interruption by mainly the host is made
+	 * @throws IllegalArgumentException is thrown when the BEARING_THRESHOLD_ANGLE is exceeded
 	 */
 	private Data calibrateLeftSlow() throws InterruptedException, IllegalArgumentException {
 		activity.runOnUiThread(new Runnable() {
@@ -403,12 +384,10 @@ public class CalibrationTask implements Runnable {
 
 	/**
 	 * calibrates the right wheel with slow velocity
-	 * 
+	 *
 	 * @return speed in centimeters per second
-	 * @throws InterruptedException
-	 *             is thrown when an interruption by mainly the host is made
-	 * @throws IllegalArgumentException
-	 *             is thrown when the BEARING_THRESHOLD_ANGLE is exceeded
+	 * @throws InterruptedException     is thrown when an interruption by mainly the host is made
+	 * @throws IllegalArgumentException is thrown when the BEARING_THRESHOLD_ANGLE is exceeded
 	 */
 	private Data calibrateRightSlow() throws IllegalArgumentException, InterruptedException {
 		activity.runOnUiThread(new Runnable() {
@@ -425,12 +404,10 @@ public class CalibrationTask implements Runnable {
 
 	/**
 	 * calibrates the left wheel with medium velocity
-	 * 
+	 *
 	 * @return speed in centimeters per second
-	 * @throws InterruptedException
-	 *             is thrown when an interruption by mainly the host is made
-	 * @throws IllegalArgumentException
-	 *             is thrown when the BEARING_THRESHOLD_ANGLE is exceeded
+	 * @throws InterruptedException     is thrown when an interruption by mainly the host is made
+	 * @throws IllegalArgumentException is thrown when the BEARING_THRESHOLD_ANGLE is exceeded
 	 */
 	private Data calibrateLeftMedm() throws IllegalArgumentException, InterruptedException {
 		activity.runOnUiThread(new Runnable() {
@@ -448,12 +425,10 @@ public class CalibrationTask implements Runnable {
 
 	/**
 	 * calibrates the right wheel with medium velocity
-	 * 
+	 *
 	 * @return speed in centimeters per second
-	 * @throws InterruptedException
-	 *             is thrown when an interruption by mainly the host is made
-	 * @throws IllegalArgumentException
-	 *             is thrown when the BEARING_THRESHOLD_ANGLE is exceeded
+	 * @throws InterruptedException     is thrown when an interruption by mainly the host is made
+	 * @throws IllegalArgumentException is thrown when the BEARING_THRESHOLD_ANGLE is exceeded
 	 */
 	private Data calibrateRightMedm() throws IllegalArgumentException, InterruptedException {
 		activity.runOnUiThread(new Runnable() {
@@ -470,12 +445,10 @@ public class CalibrationTask implements Runnable {
 
 	/**
 	 * calibrates the left wheel with fast velocity
-	 * 
+	 *
 	 * @return speed in centimeters per second
-	 * @throws InterruptedException
-	 *             is thrown when an interruption by mainly the host is made
-	 * @throws IllegalArgumentException
-	 *             is thrown when the BEARING_THRESHOLD_ANGLE is exceeded
+	 * @throws InterruptedException     is thrown when an interruption by mainly the host is made
+	 * @throws IllegalArgumentException is thrown when the BEARING_THRESHOLD_ANGLE is exceeded
 	 */
 	private Data calibrateLeftFast() throws IllegalArgumentException, InterruptedException {
 		activity.runOnUiThread(new Runnable() {
@@ -492,12 +465,10 @@ public class CalibrationTask implements Runnable {
 
 	/**
 	 * calibrates the right wheel with fast velocity
-	 * 
+	 *
 	 * @return speed in centimeters per second
-	 * @throws InterruptedException
-	 *             is thrown when an interruption by mainly the host is made
-	 * @throws IllegalArgumentException
-	 *             is thrown when the BEARING_THRESHOLD_ANGLE is exceeded
+	 * @throws InterruptedException     is thrown when an interruption by mainly the host is made
+	 * @throws IllegalArgumentException is thrown when the BEARING_THRESHOLD_ANGLE is exceeded
 	 */
 	private Data calibrateRightFast() throws IllegalArgumentException, InterruptedException {
 		activity.runOnUiThread(new Runnable() {
@@ -530,7 +501,7 @@ public class CalibrationTask implements Runnable {
 			});
 		} catch (IllegalArgumentException e) {
 			if (ComDriver.getInstance().isConnected())
-				ComDriver.getInstance().comReadWrite(new byte[] { 'i', 0, 0, '\r', '\n' });
+				ComDriver.getInstance().comReadWrite(new byte[]{'i', 0, 0, '\r', '\n'});
 			activity.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
@@ -542,7 +513,7 @@ public class CalibrationTask implements Runnable {
 			e.printStackTrace();
 		} catch (InterruptedException e) {
 			if (ComDriver.getInstance().isConnected())
-				ComDriver.getInstance().comReadWrite(new byte[] { 'i', 0, 0, '\r', '\n' });
+				ComDriver.getInstance().comReadWrite(new byte[]{'i', 0, 0, '\r', '\n'});
 			activity.runOnUiThread(new Runnable() {
 				@Override
 				public void run() {

@@ -11,7 +11,7 @@
 
         <EditText
             android:id="@+id/robot_obstacle_avoidance_to_x"
-            android:layout_width="100dp"
+            android:layout_width="70dp"
             android:layout_height="60dp"
             android:hint="@string/robot_obstacle_avoidance_to_x_hint"
             android:imeOptions="actionDone"
@@ -19,7 +19,7 @@
 
         <EditText
             android:id="@+id/robot_obstacle_avoidance_to_y"
-            android:layout_width="100dp"
+            android:layout_width="70dp"
             android:layout_height="60dp"
             android:hint="@string/robot_obstacle_avoidance_to_y_hint"
             android:imeOptions="actionDone"
@@ -27,7 +27,7 @@
 
         <EditText
             android:id="@+id/robot_obstacle_avoidance_to_theta"
-            android:layout_width="100dp"
+            android:layout_width="70dp"
             android:layout_height="60dp"
             android:hint="@string/robot_obstacle_avoidance_to_theta_hint"
             android:imeOptions="actionDone"
@@ -35,9 +35,15 @@
 
         <Button
             android:id="@+id/robot_obstacle_avoidance_buttonStart"
-            android:layout_width="100dp"
+            android:layout_width="70dp"
             android:layout_height="60dp"
             android:text="@string/robot_obstacle_avoidance_start" />
+
+        <Button
+            android:id="@+id/robot_obstacle_avoidance_buttonReset"
+            android:layout_width="70dp"
+            android:layout_height="60dp"
+            android:text="@string/robot_obstacle_avoidance_reset" />
     </LinearLayout>
 
     <TextView

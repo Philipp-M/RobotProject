@@ -22,7 +22,7 @@ public class CalibrationDialog extends ProgressDialog implements CalibrationTask
 		setProgressStyle(STYLE_HORIZONTAL);
 		setProgressNumberFormat(null);
 		SharedPreferences robotPref = PreferenceManager.getDefaultSharedPreferences(context);
-		calibrationThread = new Thread(new CalibrationTask((Activity) context, this, (long)robotPref.getInt(
+		calibrationThread = new Thread(new CalibrationTask((Activity) context, this, (long) robotPref.getInt(
 				context.getString(R.string.prefRobotCalibrationTime), 8000), robotPref.getInt(
 				context.getString(R.string.prefRobotSlowVelocity), 18), robotPref.getInt(
 				context.getString(R.string.prefRobotMedmVelocity), 32), robotPref.getInt(

@@ -5,6 +5,7 @@ public class StopWatch {
 	private long startTime;
 	private long stopTime;
 	private boolean stopped;
+
 	public StopWatch() {
 		stopped = true;
 	}
@@ -20,9 +21,9 @@ public class StopWatch {
 	}
 
 	public long getTime() {
-		if(stopped)
+		if (stopped)
 			return stopTime - startTime;
 		else
-			return System.currentTimeMillis()-startTime;
+			return System.currentTimeMillis() - startTime;
 	}
 }

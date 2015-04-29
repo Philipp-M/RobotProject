@@ -105,7 +105,7 @@ public class QuadDriverFragment extends Fragment implements QuadDriverListener {
 		final EditText editText = (EditText) rootView.findViewById(R.id.robot_quad_drive_distance_to_drive);
 		editText.setText(""
 				+ PreferenceManager.getDefaultSharedPreferences(rootView.getContext()).getFloat(
-						rootView.getContext().getString(R.string.prefRobotQuadDriveDistance), 20.0f));
+				rootView.getContext().getString(R.string.prefRobotQuadDriveDistance), 20.0f));
 		editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
 			@Override
 			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -156,7 +156,7 @@ public class QuadDriverFragment extends Fragment implements QuadDriverListener {
 		private QuadDriverListener listener;
 
 		public QuadDriveRunnable(double distancePerEdge, short robotSpeed, float robotSpeedCmL, float robotSpeedCmR,
-				QuadDriverListener listener) {
+		                         QuadDriverListener listener) {
 			this.robotSpeed = robotSpeed;
 			this.robotSpeedCmL = robotSpeedCmL;
 			this.robotSpeedCmR = robotSpeedCmR;
@@ -169,27 +169,27 @@ public class QuadDriverFragment extends Fragment implements QuadDriverListener {
 
 			float timeL = (float) (distancePerEdge / (double) robotSpeedCmL);
 			float timeR = (float) (distancePerEdge / (double) robotSpeedCmR);
-			cm.comReadWrite(new byte[] { 'i', (byte) robotSpeed, (byte) ((float) robotSpeed * timeR / timeL), '\r', '\n' });
+			cm.comReadWrite(new byte[]{'i', (byte) robotSpeed, (byte) ((float) robotSpeed * timeR / timeL), '\r', '\n'});
 			Thread.sleep((long) (timeL * 1000.0f));
-			cm.comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
+			cm.comReadWrite(new byte[]{'i', (byte) 0, (byte) 0, '\r', '\n'});
 
 		}
 
 		private void turnRight90Degrees() throws InterruptedException {
 			double wheelDistance = Math.PI / 2.0 * CalibrationTask.ROBOT_AXLE_LENGTH;
 			float time = (float) wheelDistance / robotSpeedCmL;
-			ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) robotSpeed, (byte) 0, '\r', '\n' });
+			ComDriver.getInstance().comReadWrite(new byte[]{'i', (byte) robotSpeed, (byte) 0, '\r', '\n'});
 			Thread.sleep((long) (time * 1000.0f));
-			ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
+			ComDriver.getInstance().comReadWrite(new byte[]{'i', (byte) 0, (byte) 0, '\r', '\n'});
 		}
 
 		@SuppressWarnings("unused")
 		private void turnLeft90Degrees() throws InterruptedException {
 			double wheelDistance = Math.PI / 2.0 * CalibrationTask.ROBOT_AXLE_LENGTH;
 			float time = (float) wheelDistance / robotSpeedCmR;
-			ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) robotSpeed, '\r', '\n' });
+			ComDriver.getInstance().comReadWrite(new byte[]{'i', (byte) 0, (byte) robotSpeed, '\r', '\n'});
 			Thread.sleep((long) (time * 1000.0f));
-			ComDriver.getInstance().comReadWrite(new byte[] { 'i', (byte) 0, (byte) 0, '\r', '\n' });
+			ComDriver.getInstance().comReadWrite(new byte[]{'i', (byte) 0, (byte) 0, '\r', '\n'});
 		}
 
 		@Override

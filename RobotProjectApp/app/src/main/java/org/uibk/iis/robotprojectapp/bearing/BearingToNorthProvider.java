@@ -27,9 +27,8 @@ public class BearingToNorthProvider implements SensorEventListener, LocationList
 	public static interface ChangeEventListener {
 		/**
 		 * Callback method to be invoked when the bearing changes.
-		 * 
-		 * @param bearing
-		 *            the new bearing value
+		 *
+		 * @param bearing the new bearing value
 		 */
 		void onBearingChanged(double bearing);
 	}
@@ -98,27 +97,21 @@ public class BearingToNorthProvider implements SensorEventListener, LocationList
 	/**
 	 * Default constructor.
 	 *
-	 * @param context
-	 *            Application Context
+	 * @param context Application Context
 	 */
 	public BearingToNorthProvider(Context context) {
 		this(context, 10, 0.5, 50, true);
 	}
 
 	/**
-	 * @param context
-	 *            Application Context
-	 * @param smoothing
-	 *            the number of measurements used to calculate a mean for the
-	 *            azimuth. Set this to 1 for the smallest delay. Setting it to
-	 *            5-10 to prevents the needle from going crazy
-	 * @param minDiffForEvent
-	 *            minimum change of bearing (degrees) to notify the change
-	 *            listener
-	 * @param throttleTime
-	 *            minimum delay (millis) between notifications for the change
-	 *            listener
-	 * 
+	 * @param context         Application Context
+	 * @param smoothing       the number of measurements used to calculate a mean for the
+	 *                        azimuth. Set this to 1 for the smallest delay. Setting it to
+	 *                        5-10 to prevents the needle from going crazy
+	 * @param minDiffForEvent minimum change of bearing (degrees) to notify the change
+	 *                        listener
+	 * @param throttleTime    minimum delay (millis) between notifications for the change
+	 *                        listener
 	 */
 	public BearingToNorthProvider(Context context, int smoothing, double minDiffForEvent, int throttleTime, boolean locationEnabled) {
 		mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
@@ -172,7 +165,7 @@ public class BearingToNorthProvider implements SensorEventListener, LocationList
 	public void stop() {
 		mSensorManager.unregisterListener(this, mSensorAccelerometer);
 		mSensorManager.unregisterListener(this, mSensorMagneticField);
-		if(locationEnabled)
+		if (locationEnabled)
 			mLocationManager.removeUpdates(this);
 	}
 
@@ -185,7 +178,7 @@ public class BearingToNorthProvider implements SensorEventListener, LocationList
 
 	/**
 	 * Returns the bearing event listener to which bearing events must be sent.
-	 * 
+	 *
 	 * @return the bearing event listener
 	 */
 	public ChangeEventListener getChangeEventListener() {
@@ -195,9 +188,8 @@ public class BearingToNorthProvider implements SensorEventListener, LocationList
 	/**
 	 * Specifies the bearing event listener to which bearing events must be
 	 * sent.
-	 * 
-	 * @param changeEventListener
-	 *            the bearing event listener
+	 *
+	 * @param changeEventListener the bearing event listener
 	 */
 	public void setChangeEventListener(ChangeEventListener changeEventListener) {
 		this.mChangeEventListener = changeEventListener;
@@ -210,12 +202,12 @@ public class BearingToNorthProvider implements SensorEventListener, LocationList
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 		switch (event.sensor.getType()) {
-		case Sensor.TYPE_ACCELEROMETER:
-			System.arraycopy(event.values, 0, mValuesAccelerometer, 0, 3);
-			break;
-		case Sensor.TYPE_MAGNETIC_FIELD:
-			System.arraycopy(event.values, 0, mValuesMagneticField, 0, 3);
-			break;
+			case Sensor.TYPE_ACCELEROMETER:
+				System.arraycopy(event.values, 0, mValuesAccelerometer, 0, 3);
+				break;
+			case Sensor.TYPE_MAGNETIC_FIELD:
+				System.arraycopy(event.values, 0, mValuesMagneticField, 0, 3);
+				break;
 		}
 
 		boolean success = SensorManager.getRotationMatrix(mMatrixR, mMatrixI, mValuesAccelerometer, mValuesMagneticField);

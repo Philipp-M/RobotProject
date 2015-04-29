@@ -17,6 +17,7 @@
     <string name="robot_quad_drive_distance_to_drive_hint">distance to drive in cm at one edge</string>
     <string name="robot_quad_drive_start">Start!</string>
     <string name="robot_obstacle_avoidance_start">Start!</string>
+    <string name="robot_obstacle_avoidance_reset">Reset!</string>
     <string name="robot_obstacle_avoidance_to_x_hint">x coord</string>
     <string name="robot_obstacle_avoidance_to_y_hint">y coord</string>
     <string name="robot_obstacle_avoidance_to_theta_hint">angle</string>

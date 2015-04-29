@@ -48,6 +48,11 @@ public class ObstacleAvoidanceFragment extends Fragment implements SimpleSimpleO
 			}
 		});
 
+		((Button) rootView.findViewById(R.id.robot_obstacle_avoidance_buttonReset)).setOnClickListener(new OnClickListener() {
+			public void onClick(View v) {
+				OdometryManager.getInstance().resetPosition();
+			}
+		});
 		return rootView;
 	}
 
@@ -81,7 +86,7 @@ public class ObstacleAvoidanceFragment extends Fragment implements SimpleSimpleO
 			} catch (NumberFormatException e) {
 				theta = 0;
 			}
-			simpleObstacleAvoidance = new SimpleSimpleObstacleAvoidance(SimpleSimpleObstacleAvoidance.Dir.RANDOM,
+			simpleObstacleAvoidance = new SimpleSimpleObstacleAvoidance(SimpleSimpleObstacleAvoidance.Dir.COUNTERCLOCKWISE,
 					new OdometryManager.Position(x, y, Math.toRadians(theta)), this);
 		}
 	}

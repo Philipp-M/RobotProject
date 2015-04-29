@@ -10,12 +10,13 @@ public class ObstacleSurrounder {
 	public enum Dir {
 		LEFT, RIGHT
 	}
+
 	private Dir direction;
 	private int distanceToObject;
-	
+
 	public ObstacleSurrounder(Dir direction, int distanceToObject) {
 		this.direction = direction;
 		this.distanceToObject = distanceToObject;
 	}
-	
+
 }

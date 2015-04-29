@@ -106,72 +106,72 @@ public class RobotWASDFragment extends Fragment {
 	// move forward
 	public void buttonW_onClick(View v) {
 		if (ComDriver.getInstance().isConnected())
-			logText(ComDriver.getInstance().comReadWrite(new byte[] { 'w', '\r', '\n' }));
+			logText(ComDriver.getInstance().comReadWrite(new byte[]{'w', '\r', '\n'}));
 	}
 
 	// turn left
 	public void buttonA_onClick(View v) {
 		if (ComDriver.getInstance().isConnected())
-			logText(ComDriver.getInstance().comReadWrite(new byte[] { 'a', '\r', '\n' }));
+			logText(ComDriver.getInstance().comReadWrite(new byte[]{'a', '\r', '\n'}));
 	}
 
 	// stop
 	public void buttonS_onClick(View v) {
 		if (ComDriver.getInstance().isConnected())
-			logText(ComDriver.getInstance().comReadWrite(new byte[] { 's', '\r', '\n' }));
+			logText(ComDriver.getInstance().comReadWrite(new byte[]{'s', '\r', '\n'}));
 	}
 
 	// turn right
 	public void buttonD_onClick(View v) {
 		if (ComDriver.getInstance().isConnected())
-			logText(ComDriver.getInstance().comReadWrite(new byte[] { 'd', '\r', '\n' }));
+			logText(ComDriver.getInstance().comReadWrite(new byte[]{'d', '\r', '\n'}));
 	}
 
 	// move backward
 	public void buttonX_onClick(View v) {
 		if (ComDriver.getInstance().isConnected())
-			logText(ComDriver.getInstance().comReadWrite(new byte[] { 'x', '\r', '\n' }));
+			logText(ComDriver.getInstance().comReadWrite(new byte[]{'x', '\r', '\n'}));
 	}
 
 	// lower bar a few degrees
 	public void buttonMinus_onClick(View v) {
 		if (ComDriver.getInstance().isConnected())
-			logText(ComDriver.getInstance().comReadWrite(new byte[] { '-', '\r', '\n' }));
+			logText(ComDriver.getInstance().comReadWrite(new byte[]{'-', '\r', '\n'}));
 	}
 
 	// rise bar a few degrees
 	public void buttonPlus_onClick(View v) {
 		if (ComDriver.getInstance().isConnected())
-			logText(ComDriver.getInstance().comReadWrite(new byte[] { '+', '\r', '\n' }));
+			logText(ComDriver.getInstance().comReadWrite(new byte[]{'+', '\r', '\n'}));
 	}
 
 	// fixed position for bar (low)
 	public void buttonDown_onClick(View v) {
 		if (ComDriver.getInstance().isConnected())
-			logText(ComDriver.getInstance().comReadWrite(new byte[] { 'o', 0, '\r', '\n' }));
+			logText(ComDriver.getInstance().comReadWrite(new byte[]{'o', 0, '\r', '\n'}));
 	}
 
 	// fixed position for bar (high)
 	public void buttonUp_onClick(View v) {
 		if (ComDriver.getInstance().isConnected())
-			logText(ComDriver.getInstance().comReadWrite(new byte[] { 'o', (byte) 255, '\r', '\n' }));
+			logText(ComDriver.getInstance().comReadWrite(new byte[]{'o', (byte) 255, '\r', '\n'}));
 	}
 
 	public void buttonLedOn_onClick(View v) {
 		if (ComDriver.getInstance().isConnected())
-			logText(ComDriver.getInstance().comReadWrite(new byte[] { 'r', '\r', '\n' }));
+			logText(ComDriver.getInstance().comReadWrite(new byte[]{'r', '\r', '\n'}));
 		// robotSetLeds((byte) 255, (byte) 128);
 	}
 
 	public void buttonLedOff_onClick(View v) {
 		if (ComDriver.getInstance().isConnected())
-			logText(ComDriver.getInstance().comReadWrite(new byte[] { 'e', '\r', '\n' }));
+			logText(ComDriver.getInstance().comReadWrite(new byte[]{'e', '\r', '\n'}));
 		// robotSetLeds((byte) 0, (byte) 0);
 	}
 
 	public void buttonSensor_onClick(View v) {
 		if (ComDriver.getInstance().isConnected()) {
-			logText(ComDriver.getInstance().comReadWrite(new byte[] { 'q', '\r', '\n' }));
+			logText(ComDriver.getInstance().comReadWrite(new byte[]{'q', '\r', '\n'}));
 //			ArrayList<Byte> sensorData = ComDriver.getInstance().comReadBinWrite(new byte[] { 'p', '\r', '\b' });
 //			logText("s0: " + (int) sensorData.get(0) + " s1: " + (int) sensorData.get(1) + " s2: " + (int) sensorData.get(2) + " s3: "
 //					+ (int) (0xFF & sensorData.get(3)) + " s4: " + (int) sensorData.get(4) + " s5: " + (int) sensorData.get(5) + " s6: "

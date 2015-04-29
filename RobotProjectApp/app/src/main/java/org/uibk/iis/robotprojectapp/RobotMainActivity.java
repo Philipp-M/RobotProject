@@ -63,19 +63,19 @@ public class RobotMainActivity extends ActionBarActivity implements ActionBar.Ta
 		});
 		// Setup the Com device (Robot) and the Bearing to North Provider
 		BearingToNorthSingleton.getInstance().init(this);
-		
+
 		ComDriver.getInstance().init(getBaseContext(), 9600);
-		
+
 		OdometryManager.getInstance().init(this, 0, 0, 0);
 		DistanceMeasurementProvider.getInstance().init(250);
 		DistanceMeasurementProvider.getInstance().start();
 		RobotMovementManager.getInstance().start();
-		
+
 		if (ComDriver.getInstance().isConnected()
 				&& PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.prefRobotUnlockedMode), false)) {
-			ComDriver.getInstance().comWrite(new byte[] { 'b', '\r', '\b' });
+			ComDriver.getInstance().comWrite(new byte[]{'b', '\r', '\b'});
 			ComDriver.getInstance().init(getBaseContext(), 250000);
-			ComDriver.getInstance().comWrite(new byte[] { 'i', 0, 0, '\r', '\n' });
+			ComDriver.getInstance().comWrite(new byte[]{'i', 0, 0, '\r', '\n'});
 		}
 		if (ComDriver.getInstance().isConnected())
 			Toast.makeText(getApplicationContext(), "connected to the device!", Toast.LENGTH_LONG).show();
@@ -90,7 +90,7 @@ public class RobotMainActivity extends ActionBarActivity implements ActionBar.Ta
 //			if (i == 1)
 //				actionBar.addTab(actionBar.newTab().setText(mSectionsPagerAdapter.getPageTitle(i)).setTabListener(this), true);
 //			else
-				actionBar.addTab(actionBar.newTab().setText(mSectionsPagerAdapter.getPageTitle(i)).setTabListener(this), false);
+			actionBar.addTab(actionBar.newTab().setText(mSectionsPagerAdapter.getPageTitle(i)).setTabListener(this), false);
 		}
 	}
 
@@ -107,38 +107,38 @@ public class RobotMainActivity extends ActionBarActivity implements ActionBar.Ta
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		switch (item.getItemId()) {
-		case R.id.action_settings:
-			Intent i = new Intent(this, PreferencesActivity.class);
-			startActivityForResult(i, 1);
-			return true;
+			case R.id.action_settings:
+				Intent i = new Intent(this, PreferencesActivity.class);
+				startActivityForResult(i, 1);
+				return true;
 
-		case R.id.connect:
-			if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.prefRobotUnlockedMode), false)) {
-				ComDriver.getInstance().init(getBaseContext(), 9600);
-				if (ComDriver.getInstance().isConnected()) {
-					ComDriver.getInstance().comWrite(new byte[] { 'b', '\r', '\b' });
-					ComDriver.getInstance().init(getBaseContext(), 250000);
-					ComDriver.getInstance().comReadWrite(new byte[] { 'i', 0, 0, '\r', '\n' });
-				}
-			} else
-				ComDriver.getInstance().connect(9600);
-			if (ComDriver.getInstance().isConnected())
-				Toast.makeText(getApplicationContext(), "connected to the device!", Toast.LENGTH_LONG).show();
-			else
-				Toast.makeText(getApplicationContext(), "could not connect to the device!", Toast.LENGTH_LONG).show();
-			return true;
+			case R.id.connect:
+				if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(getString(R.string.prefRobotUnlockedMode), false)) {
+					ComDriver.getInstance().init(getBaseContext(), 9600);
+					if (ComDriver.getInstance().isConnected()) {
+						ComDriver.getInstance().comWrite(new byte[]{'b', '\r', '\b'});
+						ComDriver.getInstance().init(getBaseContext(), 250000);
+						ComDriver.getInstance().comReadWrite(new byte[]{'i', 0, 0, '\r', '\n'});
+					}
+				} else
+					ComDriver.getInstance().connect(9600);
+				if (ComDriver.getInstance().isConnected())
+					Toast.makeText(getApplicationContext(), "connected to the device!", Toast.LENGTH_LONG).show();
+				else
+					Toast.makeText(getApplicationContext(), "could not connect to the device!", Toast.LENGTH_LONG).show();
+				return true;
 
-		case R.id.disconnect:
-			ComDriver.getInstance().disconnect();
-			if (!ComDriver.getInstance().isConnected())
-				Toast.makeText(getApplicationContext(), "disconnected from the device!", Toast.LENGTH_LONG).show();
-			else
-				Toast.makeText(getApplicationContext(), "could not disconnect to the device!", Toast.LENGTH_LONG).show();
-			return true;
-		case R.id.calibrate:
-			new CalibrationDialog(this).show();
-		default:
-			return super.onOptionsItemSelected(item);
+			case R.id.disconnect:
+				ComDriver.getInstance().disconnect();
+				if (!ComDriver.getInstance().isConnected())
+					Toast.makeText(getApplicationContext(), "disconnected from the device!", Toast.LENGTH_LONG).show();
+				else
+					Toast.makeText(getApplicationContext(), "could not disconnect to the device!", Toast.LENGTH_LONG).show();
+				return true;
+			case R.id.calibrate:
+				new CalibrationDialog(this).show();
+			default:
+				return super.onOptionsItemSelected(item);
 		}
 	}
 
@@ -174,9 +174,9 @@ public class RobotMainActivity extends ActionBarActivity implements ActionBar.Ta
 			// below).
 			if (position == 0)
 				return RobotWASDFragment.newInstance(position + 1);
-			else if(position == 1)
+			else if (position == 1)
 				return QuadDriverFragment.newInstance(position + 1);
-			else if(position == 2)
+			else if (position == 2)
 				return ObstacleAvoidanceFragment.newInstance(position + 1);
 			return PlaceholderFragment.newInstance(position + 1);
 		}
@@ -191,14 +191,14 @@ public class RobotMainActivity extends ActionBarActivity implements ActionBar.Ta
 		public CharSequence getPageTitle(int position) {
 			Locale l = Locale.getDefault();
 			switch (position) {
-			case 0:
-				return getString(R.string.title_section1).toUpperCase(l);
-			case 1:
-				return getString(R.string.title_section2).toUpperCase(l);
-			case 2:
-				return getString(R.string.title_section3).toUpperCase(l);
-			case 3:
-				return getString(R.string.title_section4).toUpperCase(l);
+				case 0:
+					return getString(R.string.title_section1).toUpperCase(l);
+				case 1:
+					return getString(R.string.title_section2).toUpperCase(l);
+				case 2:
+					return getString(R.string.title_section3).toUpperCase(l);
+				case 3:
+					return getString(R.string.title_section4).toUpperCase(l);
 			}
 			return null;
 		}

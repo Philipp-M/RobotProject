@@ -3,7 +3,6 @@ package org.uibk.iis.robotprojectapp.geometry;
 /**
  * since Java's generic-numeric abilities are ... somehow ... limited, a
  * hardcoded Version with doubles is used here..
- *
  */
 public class Point2D {
 	private double x;

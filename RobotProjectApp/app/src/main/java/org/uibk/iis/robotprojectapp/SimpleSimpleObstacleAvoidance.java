@@ -15,7 +15,9 @@ public class SimpleSimpleObstacleAvoidance implements DistanceMeasurementProvide
 
 	public enum Dir {
 		CLOCKWISE, COUNTERCLOCKWISE, RANDOM
-	};
+	}
+
+	;
 
 	private Dir direction;
 	private OdometryManager.Position target;
