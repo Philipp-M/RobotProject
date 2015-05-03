@@ -1,10 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <org.opencv.android.JavaCameraView
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/ball_finder_detection_camera_view" />
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical"
+              android:weightSum="1">
 
+    <org.opencv.android.JavaCameraView
+        android:id="@+id/ball_finder_detection_camera_view"
+        android:layout_width="735dp"
+        android:layout_height="413dp"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/robot_ball_finder_to_x"
+                android:layout_width="70dp"
+                android:layout_height="60dp"
+                android:hint="@string/robot_ball_finder_to_x_hint"
+                android:imeOptions="actionDone"
+                android:inputType="number|numberDecimal|numberSigned"/>
+
+            <EditText
+                android:id="@+id/robot_ball_finder_to_y"
+                android:layout_width="70dp"
+                android:layout_height="60dp"
+                android:hint="@string/robot_ball_finder_to_y_hint"
+                android:imeOptions="actionDone"
+                android:inputType="number|numberDecimal|numberSigned"/>
+
+
+            <EditText
+                android:id="@+id/robot_ball_finder_to_theta"
+                android:layout_width="70dp"
+                android:layout_height="60dp"
+                android:hint="@string/robot_ball_finder_to_theta_hint"
+                android:imeOptions="actionDone"
+                android:inputType="number|numberDecimal|numberSigned"/>
+
+            <Button
+                android:id="@+id/robot_ball_finder_buttonStart"
+                android:layout_width="70dp"
+                android:layout_height="60dp"
+                android:text="@string/robot_ball_finder_start"/>
+
+            <Button
+                android:id="@+id/robot_ball_finder_buttonReset"
+                android:layout_width="70dp"
+                android:layout_height="60dp"
+                android:text="@string/robot_ball_finder_reset"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/robot_ball_finder_ball_to_x"
+                android:layout_width="70dp"
+                android:layout_height="60dp"
+                android:hint="@string/robot_ball_finder_to_ball_x_hint"
+                android:imeOptions="actionDone"
+                android:inputType="number|numberDecimal|numberSigned"/>
+
+            <EditText
+                android:id="@+id/robot_ball_finder_ball_to_y"
+                android:layout_width="70dp"
+                android:layout_height="60dp"
+                android:hint="@string/robot_ball_finder_to_ball_y_hint"
+                android:imeOptions="actionDone"
+                android:inputType="number|numberDecimal|numberSigned"/>
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>

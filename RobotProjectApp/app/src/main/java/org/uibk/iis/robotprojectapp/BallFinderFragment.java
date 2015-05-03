@@ -10,6 +10,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import org.opencv.android.BaseLoaderCallback;
@@ -29,6 +31,22 @@ import org.opencv.imgproc.Imgproc;
 import java.util.List;
 
 public class BallFinderFragment extends Fragment implements View.OnTouchListener, CameraBridgeViewBase.CvCameraViewListener2 {
+
+	public interface BallDetectorListener {
+		void ballDetected();
+
+		void ballLost();
+
+		/**
+		 * notifies the listener if the ball has changed
+		 *
+		 * @param x      between -1.0 and 1.0
+		 * @param y      between -1.0 and 1.0
+		 * @param radius 1.0 equals the cameraView width/2;
+		 */
+		void ballChanged(double x, double y, double radius);
+	}
+
 	private static final String TAG = "OCVSample::Activity";
 
 	private boolean mIsColorSelected = false;
@@ -48,14 +66,14 @@ public class BallFinderFragment extends Fragment implements View.OnTouchListener
 	 */
 	private static final String ARG_SECTION_NUMBER = "section_number";
 
+	private boolean ballDetected;
+	private View rootView;
+	private BallDetectorListener bDListener;
+	private BallFinderTask bFTask;
+
 	/**
 	 * Returns a new instance of this fragment for the given section number.
 	 */
-	private TextView textLog;
-	private boolean isSearching;
-	private View rootView;
-	private SimpleSimpleObstacleAvoidance simpleObstacleAvoidance;
-
 	public static BallFinderFragment newInstance(int sectionNumber) {
 		BallFinderFragment fragment = new BallFinderFragment();
 		Bundle args = new Bundle();
@@ -69,7 +87,21 @@ public class BallFinderFragment extends Fragment implements View.OnTouchListener
 		View rootView = inflater.inflate(R.layout.fragment_robot_ball_finder, container, false);
 		// textLog = (TextView) rootView.findV                <action android:name="android.intent.action.MAIN" />iewById(R.id.robot_obstacle_avoidance_textLog);
 		this.rootView = rootView;
-		this.isSearching = false;
+		this.ballDetected = false;
+
+		((Button) rootView.findViewById(R.id.robot_ball_finder_buttonStart)).setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				Log.d("Ballfinder: ", "started the Ball finder!");
+				buttonStart_onClick(v);
+			}
+		});
+
+		((Button) rootView.findViewById(R.id.robot_ball_finder_buttonReset)).setOnClickListener(new View.OnClickListener() {
+			public void onClick(View v) {
+				bFTask.reset();
+				RobotMovementManager.getInstance().interruptRequestBlocking();
+			}
+		});
 		mLoaderCallback = new BaseLoaderCallback(rootView.getContext()) {
 			@Override
 			public void onManagerConnected(int status) {
@@ -100,6 +132,49 @@ public class BallFinderFragment extends Fragment implements View.OnTouchListener
 		return rootView;
 	}
 
+	public void buttonStart_onClick(View v) {
+		final EditText xEdit = (EditText) rootView.findViewById(R.id.robot_ball_finder_to_x);
+		final EditText yEdit = (EditText) rootView.findViewById(R.id.robot_ball_finder_to_y);
+		final EditText thetaEdit = (EditText) rootView.findViewById(R.id.robot_ball_finder_to_theta);
+		final EditText xBallEdit = (EditText) rootView.findViewById(R.id.robot_ball_finder_ball_to_x);
+		final EditText yBallEdit = (EditText) rootView.findViewById(R.id.robot_ball_finder_ball_to_y);
+		double x;
+		double y;
+		double theta;
+		double xBall;
+		double yBall;
+		try {
+			x = Double.parseDouble(xEdit.getText().toString());
+		} catch (NumberFormatException e) {
+			x = 0;
+		}
+		try {
+			y = Double.parseDouble(yEdit.getText().toString());
+		} catch (NumberFormatException e) {
+			y = 0;
+		}
+		try {
+			theta = Double.parseDouble(thetaEdit.getText().toString());
+		} catch (NumberFormatException e) {
+			theta = 0;
+		}
+		try {
+			xBall = Double.parseDouble(xBallEdit.getText().toString());
+		} catch (NumberFormatException e) {
+			xBall = 0;
+		}
+		try {
+			yBall = Double.parseDouble(yBallEdit.getText().toString());
+		} catch (NumberFormatException e) {
+			yBall = 0;
+		}
+		if(bFTask != null)
+			bFTask.reset();
+		bFTask = new BallFinderTask(x, y, theta, xBall, yBall);
+		bDListener = bFTask;
+		bFTask.start();
+		bFTask.searchBall();
+	}
 
 	@Override
 	public void onPause() {
@@ -194,6 +269,16 @@ public class BallFinderFragment extends Fragment implements View.OnTouchListener
 			List<MatOfPoint> contours = mDetector.getContours();
 			Log.e(TAG, "Contours count: " + contours.size());
 			Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
+			// ball finder notification starts here
+			if (!ballDetected && contours.size() >= 1) {
+				if(bDListener != null)
+					bDListener.ballDetected();
+				ballDetected = true;
+			} else if (ballDetected && contours.size() == 0) {
+				if(bDListener != null)
+					bDListener.ballLost();
+				ballDetected = false;
+			}
 			if (contours.size() == 1) {
 				Point centroid = new Point(0, 0);
 				// get centroid
@@ -210,6 +295,10 @@ public class BallFinderFragment extends Fragment implements View.OnTouchListener
 					if (sqDisTmp > sqDis)
 						sqDis = sqDisTmp;
 				}
+				double radius = Math.sqrt(sqDis);
+				// ball has changed
+				if(bDListener != null)
+					bDListener.ballChanged(2.0 * centroid.x / mRgba.width() - 1.0, 2.0 * centroid.y / mRgba.height() - 1.0, radius / (0.5 * mRgba.width()));
 				Core.circle(mRgba, centroid, (int) Math.sqrt(sqDis), CONTOUR_COLOR);
 			}
 			Mat colorLabel = mRgba.submat(4, 68, 4, 68);
@@ -228,12 +317,6 @@ public class BallFinderFragment extends Fragment implements View.OnTouchListener
 		Imgproc.cvtColor(pointMatHsv, pointMatRgba, Imgproc.COLOR_HSV2RGB_FULL, 4);
 
 		return new Scalar(pointMatRgba.get(0, 0));
-	}
-
-	public void logText(String text) {
-		if (text.length() > 0) {
-			textLog.append("[" + text.length() + "] " + text + "\n");
-		}
 	}
 }
 

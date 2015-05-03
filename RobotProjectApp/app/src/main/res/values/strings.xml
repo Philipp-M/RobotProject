@@ -21,6 +21,13 @@
     <string name="robot_obstacle_avoidance_to_x_hint">x coord</string>
     <string name="robot_obstacle_avoidance_to_y_hint">y coord</string>
     <string name="robot_obstacle_avoidance_to_theta_hint">angle</string>
+    <string name="robot_ball_finder_start">Start</string>
+    <string name="robot_ball_finder_reset">Reset</string>
+    <string name="robot_ball_finder_to_x_hint">x coord</string>
+    <string name="robot_ball_finder_to_y_hint">y coord</string>
+    <string name="robot_ball_finder_to_ball_x_hint">x ball</string>
+    <string name="robot_ball_finder_to_ball_y_hint">y ball</string>
+    <string name="robot_ball_finder_to_theta_hint">angle</string>
     <!-- Preferences -->
     <string name="preferences_robot">Robot Preferences</string>
     <string name="preferences_robot_common">Common Options</string>
