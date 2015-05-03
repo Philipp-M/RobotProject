@@ -1,5 +1,7 @@
 package org.uibk.iis.robotprojectapp;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,6 +17,10 @@ public class RobotMovementManager {
 	 * *************************************************************
 	 * Currently following Commands are supported:
 	 * *************************************************************
+	 * ARM_DOWN
+	 * <p/>
+	 * ARM_UP
+	 * <p/>
 	 * TURN_NON_STOPPING SPEED(0, 1 or 2) ANGLE(in radian) REVERSE(0 or negative: false, else true)
 	 * <p/>
 	 * TURN SPEED(0, 1 or 2) ANGLE(in radian) REVERSE(0 or negative: false, else true)
@@ -37,7 +43,7 @@ public class RobotMovementManager {
 	 * *************************************************************
 	 */
 	public enum Commands {
-		TURN_NON_STOPPING, TURN, PIVOT_NON_STOPPING, PIVOT, FORWARD_NON_STOPPING, FORWARD, BACKWARDS, BACKWARDS_NON_STOPPING, DRIVE_STRAIGHT_TO, STOP
+		ARM_UP, ARM_DOWN, TURN_NON_STOPPING, TURN, PIVOT_NON_STOPPING, PIVOT, FORWARD_NON_STOPPING, FORWARD, BACKWARDS, BACKWARDS_NON_STOPPING, DRIVE_STRAIGHT_TO, STOP
 	}
 
 	public interface ChangeEventListener {
@@ -218,6 +224,10 @@ public class RobotMovementManager {
 
 		public static Command getReverseCommand(final Command command) {
 			switch (command.command) {
+				case ARM_DOWN:
+					return new Command(Commands.ARM_UP, command.arguments);
+				case ARM_UP:
+					return new Command(Commands.ARM_DOWN, command.arguments);
 				case DRIVE_STRAIGHT_TO: // not possible to reverse since the previous information was discarded
 					return null;
 				case FORWARD:
@@ -242,7 +252,16 @@ public class RobotMovementManager {
 		@Override
 		public void run() {
 			OdometryManager om = OdometryManager.getInstance();
+			Log.d("ball command: ", "" + command);
 			switch (command) {
+				case ARM_DOWN:
+					if(ComDriver.getInstance().isConnected())
+						ComDriver.getInstance().comReadWrite(new byte[]{'o', 0, '\r', '\n'});
+					break;
+				case ARM_UP:
+					if(ComDriver.getInstance().isConnected())
+						ComDriver.getInstance().comReadWrite(new byte[]{'o', (byte) 255, '\r', '\n'});
+					break;
 				case DRIVE_STRAIGHT_TO:
 					if (arguments.length >= 4 && arguments[0] == 0)
 						om.driveStraightTo(arguments[1], arguments[2], arguments[3], CalibrationTask.Type.SLOW);

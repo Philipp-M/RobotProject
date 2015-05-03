@@ -71,7 +71,7 @@ public class OdometryManager {
 				Thread.sleep((long) (time * 1000.0f));
 			} catch (InterruptedException e) {
 				time = (double) sw.getTime() / 1000.0;
-				theta = -robotSpeedCmL * time / CalibrationTask.ROBOT_AXLE_LENGTH;
+				theta = (theta > 0 ? 1 : -1) * robotSpeedCmL * time / CalibrationTask.ROBOT_AXLE_LENGTH;
 				return false;
 			} finally {
 				// update current angle
