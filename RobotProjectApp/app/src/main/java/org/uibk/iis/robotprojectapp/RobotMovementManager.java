@@ -1,7 +1,5 @@
 package org.uibk.iis.robotprojectapp;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,6 +51,7 @@ public class RobotMovementManager {
 	private List<ChangeEventListener> changeEventListeners;
 	private Thread commandLoopThread;
 	private boolean interruptRequest;
+	private boolean isFinished;
 	private Queue<Command> commandQueue;
 
 	/**
@@ -65,6 +64,8 @@ public class RobotMovementManager {
 	private RobotMovementManager() {
 		commandQueue = new LinkedList<RobotMovementManager.Command>();
 		changeEventListeners = new ArrayList<ChangeEventListener>();
+		isFinished = false;
+		interruptRequest = false;
 	}
 
 	public static RobotMovementManager getInstance() {
@@ -93,7 +94,9 @@ public class RobotMovementManager {
 			}
 		}
 	}
-
+	public boolean isWorking() {
+		return isFinished;
+	}
 	/**
 	 * registers the given listener
 	 *
@@ -173,7 +176,7 @@ public class RobotMovementManager {
 					synchronized (RobotMovementManager.getInstance()) {
 						if (isInterrupted() && currentCommand == null) {
 							interruptRequest = false;
-
+							isFinished = true;
 							for (ChangeEventListener cEL : changeEventListeners)
 								cEL.onFinishedExecution();
 						} else if (isInterrupted() && currentCommand != null) {
@@ -183,20 +186,24 @@ public class RobotMovementManager {
 							interruptRequest = false;
 							currentCommand = null;
 							commandQueue.clear();
+							isFinished = true;
 
 						} else if (currentCommand == null && !commandQueue.isEmpty()) {
 							currentCommand = new Thread(commandQueue.remove());
 							currentCommand.start();
+							isFinished = false;
 						} else if (currentCommand != null && !currentCommand.isAlive()) {
 							currentCommand.join();
 
 							if (commandQueue.isEmpty()) {
 								currentCommand = null;
+								isFinished = true;
 								for (ChangeEventListener cEL : changeEventListeners)
 									cEL.onFinishedExecution();
 							} else {
 								currentCommand = new Thread(commandQueue.remove());
 								currentCommand.start();
+								isFinished = false;
 							}
 						}
 					}
@@ -252,7 +259,6 @@ public class RobotMovementManager {
 		@Override
 		public void run() {
 			OdometryManager om = OdometryManager.getInstance();
-			Log.d("ball command: ", "" + command);
 			switch (command) {
 				case ARM_DOWN:
 					if(ComDriver.getInstance().isConnected())
@@ -263,12 +269,21 @@ public class RobotMovementManager {
 						ComDriver.getInstance().comReadWrite(new byte[]{'o', (byte) 255, '\r', '\n'});
 					break;
 				case DRIVE_STRAIGHT_TO:
-					if (arguments.length >= 4 && arguments[0] == 0)
-						om.driveStraightTo(arguments[1], arguments[2], arguments[3], CalibrationTask.Type.SLOW);
-					else if (arguments.length >= 4 && arguments[0] == 1)
-						om.driveStraightTo(arguments[1], arguments[2], arguments[3], CalibrationTask.Type.MEDM);
-					else if (arguments.length >= 4 && arguments[0] == 2)
-						om.driveStraightTo(arguments[1], arguments[2], arguments[3], CalibrationTask.Type.FAST);
+					if(arguments.length >= 4) {
+						if (arguments[0] == 0)
+							om.driveStraightTo(arguments[1], arguments[2], arguments[3], CalibrationTask.Type.SLOW);
+						else if (arguments[0] == 1)
+							om.driveStraightTo(arguments[1], arguments[2], arguments[3], CalibrationTask.Type.MEDM);
+						else if (arguments[0] == 2)
+							om.driveStraightTo(arguments[1], arguments[2], arguments[3], CalibrationTask.Type.FAST);
+					} else if(arguments.length == 3) {
+						if (arguments[0] == 0)
+							om.driveStraightTo(arguments[1], arguments[2], CalibrationTask.Type.SLOW);
+						else if (arguments[0] == 1)
+							om.driveStraightTo(arguments[1], arguments[2], CalibrationTask.Type.MEDM);
+						else if (arguments[0] == 2)
+							om.driveStraightTo(arguments[1], arguments[2], CalibrationTask.Type.FAST);
+					}
 					break;
 				case FORWARD:
 					if (arguments.length >= 2 && arguments[0] == 0)

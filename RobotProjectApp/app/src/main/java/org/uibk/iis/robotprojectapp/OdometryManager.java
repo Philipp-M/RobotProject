@@ -237,16 +237,18 @@ public class OdometryManager {
 		return driveForwardNonStopping(distance, speed, true);
 	}
 
-	public synchronized void driveForward(double distance, CalibrationTask.Type speed) {
-		driveForwardNonStopping(distance, speed, false);
+	public synchronized boolean driveForward(double distance, CalibrationTask.Type speed) {
+		boolean retVal = driveForwardNonStopping(distance, speed, false);
 		if (ComDriver.getInstance().isConnected())
 			ComDriver.getInstance().comReadWrite(new byte[]{'i', (byte) 0, (byte) 0, '\r', '\n'});
+		return retVal;
 	}
 
-	public synchronized void driveBackwards(double distance, CalibrationTask.Type speed) {
-		driveForwardNonStopping(distance, speed, true);
+	public synchronized boolean driveBackwards(double distance, CalibrationTask.Type speed) {
+			boolean retVal = 	driveForwardNonStopping(distance, speed, true);
 		if (ComDriver.getInstance().isConnected())
 			ComDriver.getInstance().comReadWrite(new byte[]{'i', (byte) 0, (byte) 0, '\r', '\n'});
+		return retVal;
 	}
 
 	public synchronized void stop() {
@@ -287,6 +289,26 @@ public class OdometryManager {
 		}
 	}
 
+	public synchronized boolean driveStraightTo(double x, double y, CalibrationTask.Type speed) {
+		double xDiff = x - pos.x;
+		double yDiff = y - pos.y;
+		double distance = Math.sqrt(xDiff * xDiff + yDiff * yDiff);
+		if (distance > 2) {
+			double tmpTheta = Math.asin(yDiff / distance);
+			double tmpTheta1;
+			if (xDiff < 0 && yDiff > 0)
+				tmpTheta = Math.toRadians(180) - tmpTheta;
+			if (xDiff < 0 && yDiff < 0)
+				tmpTheta = -Math.toRadians(180) - tmpTheta;
+			tmpTheta1 = tmpTheta - pos.theta;
+
+			// following is possible due to "short-circuit-evaluation"
+			return (!Thread.interrupted() && pivotAngleNonStopping(tmpTheta1, speed) && !Thread.interrupted()
+					&& driveForward(distance, speed));
+		} else {
+			return true;
+		}
+	}
 	public static class Position {
 		public Position(double x, double y, double theta) {
 			this.x = x;
