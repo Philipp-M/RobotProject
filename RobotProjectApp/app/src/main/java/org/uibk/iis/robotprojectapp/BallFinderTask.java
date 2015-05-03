@@ -4,12 +4,12 @@ import android.hardware.Camera;
 import android.util.Log;
 import android.widget.Toast;
 
-public class BallFinderTask implements BallFinderFragment.BallDetectorListener {
+public class BallFinderTask implements BallFinderFragment.BallDetectorListener, RobotMovementManager.ChangeEventListener {
+
 	public enum Dir {
 		CLOCKWISE, COUNTERCLOCKWISE, NONE
 	}
 
-	private static final double BALL_CATCH_RADIUS_THRESHOLD = 0.3;
 	private static final double BALL_RADIUS = 6.3;
 	private static final double CAMERA_FIELD_OF_VIEW = 1.0155659339644644474;
 	private boolean ballCatched;
@@ -116,19 +116,27 @@ public class BallFinderTask implements BallFinderFragment.BallDetectorListener {
 					driveTowardsBall(distance);
 					ballDetected = false;
 				}
-				// the distance threshold value has to be adjusted, 25-38 seem to be a good value
+				// the distance threshold value has to be adjusted, 25-38 seem to be good values
 				if (distance <= 35) {
 					rMIns.interruptRequestBlocking();
 					ballCatched = true;
 					turnToBall(x);
 					armDown();
-					rMIns.addCommand(new RobotMovementManager.Command(RobotMovementManager.Commands.DRIVE_STRAIGHT_TO, 0, xBall, yBall, 0));
+					rMIns.addCommand(new RobotMovementManager.Command(RobotMovementManager.Commands.DRIVE_STRAIGHT_TO, 0, xBall, yBall));
 					armUp();
 					rMIns.addCommand(new RobotMovementManager.Command(RobotMovementManager.Commands.DRIVE_STRAIGHT_TO, 0, xFin, yFin, aFin));
 
 				}
 			}
 		}
-		OdometryManager.Position pos = OdometryManager.getInstance().getPosition();
+	}
+	@Override
+	public void onFinishedExecution() {
+		if(ballCatched) {
+			started = false;
+			ballCatched = false;
+			ballDetected = false;
+			lastDirection = Dir.NONE;
+		}
 	}
 }
