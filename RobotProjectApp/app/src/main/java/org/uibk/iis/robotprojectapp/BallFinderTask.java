@@ -14,6 +14,7 @@ public class BallFinderTask implements BallFinderFragment.BallDetectorListener, 
 	private static final double CAMERA_FIELD_OF_VIEW = 1.0155659339644644474;
 	private boolean ballCatched;
 	private boolean ballDetected;
+	boolean ballTracing = false;
 	private boolean started;
 	private Dir lastDirection;
 	private RobotMovementManager rMIns;
@@ -30,6 +31,7 @@ public class BallFinderTask implements BallFinderFragment.BallDetectorListener, 
 		ballCatched = false;
 		started = false;
 		ballDetected = false;
+
 		this.xFin = xFin;
 		this.yFin = yFin;
 		this.aFin = aFin;
@@ -46,6 +48,7 @@ public class BallFinderTask implements BallFinderFragment.BallDetectorListener, 
 	public void stop() {
 		started = false;
 	}
+
 	public void reset() {
 		ballCatched = false;
 		started = false;
@@ -75,7 +78,7 @@ public class BallFinderTask implements BallFinderFragment.BallDetectorListener, 
 	}
 
 	private void driveTowardsBall(double distance) {
-		rMIns.addCommand(new RobotMovementManager.Command(RobotMovementManager.Commands.FORWARD, 0, distance));
+		rMIns.addCommand(new RobotMovementManager.Command(RobotMovementManager.Commands.FORWARD, 0, distance * 1.5));
 	}
 
 	public void searchBall() {
@@ -101,8 +104,13 @@ public class BallFinderTask implements BallFinderFragment.BallDetectorListener, 
 	@Override
 	public void ballLost() {
 		if (started) {
-			if (!ballCatched)
+			if (!ballCatched) {
+				ballDetected = false;
+				ballTracing = false;
+				//ballDetected = true;
+				rMIns.interruptRequestBlocking();
 				searchBall();
+			}
 		}
 	}
 
@@ -113,13 +121,20 @@ public class BallFinderTask implements BallFinderFragment.BallDetectorListener, 
 				double distance = calculateBallDistance(radius);
 				if (ballDetected) {
 					turnToBall(x);
-					driveTowardsBall(distance);
+					//turnToBall(x);
 					ballDetected = false;
+					ballTracing = true;
+				}
+				if (!ballDetected && !ballTracing) {
+					ballTracing = true;
+					turnToBall(x);
+					driveTowardsBall(distance);
 				}
 				// the distance threshold value has to be adjusted, 25-38 seem to be good values
-				if (distance <= 35) {
+				if (distance <= 32) {
 					rMIns.interruptRequestBlocking();
 					ballCatched = true;
+					ballTracing = false;
 					turnToBall(x);
 					armDown();
 					rMIns.addCommand(new RobotMovementManager.Command(RobotMovementManager.Commands.DRIVE_STRAIGHT_TO, 0, xBall, yBall));
@@ -130,12 +145,16 @@ public class BallFinderTask implements BallFinderFragment.BallDetectorListener, 
 			}
 		}
 	}
+
 	@Override
 	public void onFinishedExecution() {
-		if(ballCatched) {
+		if(!ballDetected)
+			ballTracing = false;
+		if (ballCatched) {
 			started = false;
 			ballCatched = false;
 			ballDetected = false;
+			ballTracing = false;
 			lastDirection = Dir.NONE;
 		}
 	}

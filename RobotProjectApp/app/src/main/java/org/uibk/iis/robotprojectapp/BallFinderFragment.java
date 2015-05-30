@@ -270,7 +270,7 @@ public class BallFinderFragment extends Fragment implements View.OnTouchListener
 			Log.e(TAG, "Contours count: " + contours.size());
 			Imgproc.drawContours(mRgba, contours, -1, CONTOUR_COLOR);
 			// ball finder notification starts here
-			if (!ballDetected && contours.size() >= 1) {
+			if (!ballDetected && contours.size() == 1) {
 				if(bDListener != null)
 					bDListener.ballDetected();
 				ballDetected = true;

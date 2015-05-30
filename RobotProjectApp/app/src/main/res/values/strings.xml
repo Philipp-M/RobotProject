@@ -7,6 +7,7 @@
     <string name="title_section2">Quad Drive</string>
     <string name="title_section3">Obst. Avoid.</string>
     <string name="title_section4">Ball Finder</string>
+    <string name="title_section5">Beacon Ball</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="connect">Connect</string>
@@ -28,10 +29,21 @@
     <string name="robot_ball_finder_to_ball_x_hint">x ball</string>
     <string name="robot_ball_finder_to_ball_y_hint">y ball</string>
     <string name="robot_ball_finder_to_theta_hint">angle</string>
+    <string name="robot_beacon_ball_start">Start</string>
+    <string name="robot_beacon_ball_reset">Reset</string>
+    <string name="robot_beacon_ball_to_x_hint">x coord</string>
+    <string name="robot_beacon_ball_to_y_hint">y coord</string>
+    <string name="robot_beacon_ball_to_ball_x_hint">x ball</string>
+    <string name="robot_beacon_ball_to_ball_y_hint">y ball</string>
+    <string name="robot_beacon_ball_to_theta_hint">angle</string>
+    <string name="robot_beacon_ball_calibrate_homography">Hom. Calib.</string>
+    <string name="robot_beacon_ball_calibrate_colors">Col. Calib.</string>
     <!-- Preferences -->
     <string name="preferences_robot">Robot Preferences</string>
     <string name="preferences_robot_common">Common Options</string>
     <string name="preferences_robot_common_summary">Settings like the unlocked mode</string>
+    <string name="preferences_robot_common_cameraFragment">specifies which view will be the camera View</string>
+    <string name="preferences_robot_common_cameraFragment_summary">camera View</string>
     <string name="preferences_robot_common_unlocked">Unlocked Mode</string>
     <string name="preferences_robot_common_unlocked_summary">unlocks some stuff on the modded version of the robot like 25x times faster transfer speed</string>
     <string name="preferences_robot_calibration">Calibration</string>

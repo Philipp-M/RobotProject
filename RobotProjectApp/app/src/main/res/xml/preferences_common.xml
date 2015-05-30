@@ -7,6 +7,13 @@
             android:title="@string/preferences_robot_common_unlocked"
             android:summary="@string/preferences_robot_common_unlocked_summary"
             ></CheckBoxPreference>
+        <org.uibk.iis.robotprojectapp.IntEditTextPreference
+            android:dialogTitle="@string/preferences_robot_common_cameraFragment"
+            android:key="@string/prefRobotCameraView"
+            android:maxLength="2"
+            android:numeric="integer"
+            android:summary="@string/preferences_robot_common_cameraFragment_summary"
+            android:title="@string/preferences_robot_common_cameraFragment" />
     </PreferenceCategory>
 
 </PreferenceScreen>
