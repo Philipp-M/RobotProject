@@ -139,13 +139,12 @@ public class RobotMovementManager {
 	 */
 	public void interruptRequestBlocking() {
 		interruptRequest();
-		while (isInterrupted()) {
-			try {
-				Thread.sleep(5);
-			} catch (InterruptedException e) {
+		try {
+			synchronized (commandQueue) {
+				commandQueue.wait();
 			}
+		} catch (InterruptedException e) {
 		}
-
 	}
 
 	/**
@@ -177,6 +176,9 @@ public class RobotMovementManager {
 						if (isInterrupted() && currentCommand == null) {
 							interruptRequest = false;
 							isFinished = true;
+							synchronized (commandQueue) {
+								commandQueue.notifyAll();
+							}
 							for (ChangeEventListener cEL : changeEventListeners)
 								cEL.onFinishedExecution();
 						} else if (isInterrupted() && currentCommand != null) {
@@ -187,7 +189,11 @@ public class RobotMovementManager {
 							currentCommand = null;
 							commandQueue.clear();
 							isFinished = true;
-
+							synchronized (commandQueue) {
+								commandQueue.notifyAll();
+							}
+							for (ChangeEventListener cEL : changeEventListeners)
+								cEL.onFinishedExecution();
 						} else if (currentCommand == null && !commandQueue.isEmpty()) {
 							currentCommand = new Thread(commandQueue.remove());
 							currentCommand.start();
@@ -197,6 +203,9 @@ public class RobotMovementManager {
 
 							if (commandQueue.isEmpty()) {
 								currentCommand = null;
+								synchronized (commandQueue) {
+									commandQueue.notifyAll();
+								}
 								isFinished = true;
 								for (ChangeEventListener cEL : changeEventListeners)
 									cEL.onFinishedExecution();

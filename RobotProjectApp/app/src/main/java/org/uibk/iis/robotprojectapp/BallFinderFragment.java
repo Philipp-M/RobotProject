@@ -296,6 +296,7 @@ public class BallFinderFragment extends Fragment implements View.OnTouchListener
 						sqDis = sqDisTmp;
 				}
 				double radius = Math.sqrt(sqDis);
+				Log.d("Homography", "center: " + centroid.x + ", " + centroid.y);
 				// ball has changed
 				if(bDListener != null)
 					bDListener.ballChanged(2.0 * centroid.x / mRgba.width() - 1.0, 2.0 * centroid.y / mRgba.height() - 1.0, radius / (0.5 * mRgba.width()));

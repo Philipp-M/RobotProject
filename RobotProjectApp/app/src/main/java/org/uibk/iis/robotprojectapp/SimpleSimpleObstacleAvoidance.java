@@ -22,10 +22,12 @@ public class SimpleSimpleObstacleAvoidance implements DistanceMeasurementProvide
 	private Dir direction;
 	private OdometryManager.Position target;
 	private ChangeEventListener changeEventListener;
+	private boolean isInterrupted;
 
 	public SimpleSimpleObstacleAvoidance(Dir direction, OdometryManager.Position target, ChangeEventListener changeEventListener) {
 		this.direction = direction;
 		this.target = target;
+		this.isInterrupted = false;
 		DistanceMeasurementProvider.getInstance().registerListener(this, (short) 1, (short) 07, 1300);
 		RobotMovementManager.getInstance().registerListener(this);
 		this.changeEventListener = changeEventListener;
@@ -40,6 +42,7 @@ public class SimpleSimpleObstacleAvoidance implements DistanceMeasurementProvide
 
 	@Override
 	public void onDistanceBelowThreshold(short left, short center, short right) {
+		isInterrupted = true;
 		RobotMovementManager.getInstance().interruptRequestBlocking();
 		synchronized (RobotMovementManager.getInstance()) {
 			RobotMovementManager.getInstance().addCommand(new Command(Commands.BACKWARDS_NON_STOPPING, 0, 10));
@@ -60,8 +63,11 @@ public class SimpleSimpleObstacleAvoidance implements DistanceMeasurementProvide
 				RobotMovementManager.getInstance().unregisterListener(this);
 
 			} else {
-				RobotMovementManager.getInstance().addCommand(
-						new Command(Commands.DRIVE_STRAIGHT_TO, 0, target.getX(), target.getY(), target.getTheta()));
+				if (isInterrupted)
+					isInterrupted = false;
+				else
+					RobotMovementManager.getInstance().addCommand(
+							new Command(Commands.DRIVE_STRAIGHT_TO, 0, target.getX(), target.getY(), target.getTheta()));
 
 			}
 		}
