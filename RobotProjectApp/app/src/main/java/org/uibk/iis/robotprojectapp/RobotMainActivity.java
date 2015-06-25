@@ -179,11 +179,14 @@ public class RobotMainActivity extends ActionBarActivity implements ActionBar.Ta
 			else if (position == 2)
 				return ObstacleAvoidanceFragment.newInstance(position + 1);
 			else if (position == 3) {
-				if (PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getInt(getString(R.string.prefRobotCameraView), 4) == 3)
+				if (PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getInt(getString(R.string.prefRobotCameraView), 5) == 3)
 					return BallFinderFragment.newInstance(position + 1);
 			} else if (position == 4) {
-				if (PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getInt(getString(R.string.prefRobotCameraView), 4) == 4)
+				if (PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getInt(getString(R.string.prefRobotCameraView), 5) == 4)
 					return BeaconBallFragment.newInstance(position + 1,RobotMainActivity.this);
+			} else if (position == 5) {
+				if (PreferenceManager.getDefaultSharedPreferences(getBaseContext()).getInt(getString(R.string.prefRobotCameraView), 5) == 5)
+					return BallFinderAvoidanceFragment.newInstance(position + 1);
 			}
 			return PlaceholderFragment.newInstance(position + 1);
 		}
@@ -191,7 +194,7 @@ public class RobotMainActivity extends ActionBarActivity implements ActionBar.Ta
 		@Override
 		public int getCount() {
 			// Show 5 total pages.
-			return 5;
+			return 6;
 		}
 
 		@Override
@@ -208,6 +211,8 @@ public class RobotMainActivity extends ActionBarActivity implements ActionBar.Ta
 					return getString(R.string.title_section4).toUpperCase(l);
 				case 4:
 					return getString(R.string.title_section5).toUpperCase(l);
+				case 5:
+					return getString(R.string.title_section6).toUpperCase(l);
 			}
 			return null;
 		}

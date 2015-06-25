@@ -32,26 +32,19 @@ import org.opencv.imgproc.Imgproc;
 import java.util.LinkedList;
 import java.util.List;
 
-public class BeaconBallFragment extends Fragment implements BeaconDetector.BeaconDetectorListener, BeaconLocalizer.BeaconLocalizerListener, View.OnTouchListener, CameraBridgeViewBase.CvCameraViewListener2, WorldPositionCalculator {
+public class BeaconBallFragment extends Fragment implements RobotMovementManager.ChangeEventListener, BeaconDetector.BeaconDetectorListener, BeaconLocalizer.BeaconLocalizerListener, View.OnTouchListener, CameraBridgeViewBase.CvCameraViewListener2, WorldPositionCalculator {
+
 
 	public interface BallDetectorListener {
-		void ballDetected();
+		void ballDetected(BeaconDetector.WorldObject worldObject);
 
-		void ballLost();
-
-		/**
-		 * notifies the listener if the ball has changed
-		 *
-		 * @param x      between -1.0 and 1.0
-		 * @param y      between -1.0 and 1.0
-		 * @param radius 1.0 equals the cameraView width/2;
-		 */
-		void ballChanged(double x, double y, double radius);
+		void ballNearEnough(BeaconDetector.WorldObject worldObject);
 	}
 
 	private static final String TAG = "OCVSample::Activity";
 	public static final int COLOR_COUNT = 4;
-	public static final int BEACON_COUNT = 6;
+	public static final int BEACON_COUNT = 4;
+	public static final int BALL_COLOR = 3;
 
 	private boolean mIsColorSelected = false;
 	private Mat mRgba;
@@ -76,15 +69,20 @@ public class BeaconBallFragment extends Fragment implements BeaconDetector.Beaco
 	 */
 	private static final String ARG_SECTION_NUMBER = "section_number";
 
-	private boolean ballDetected;
+	private boolean ballDetected = false;
+	private boolean transportingBall = false;
+	private boolean odometryUpdated = false;
 	private boolean detectStopped = false;
-	private int detectedBeacon = 0;
+	private boolean turnToBall = false;
+	private boolean gotBall = false;
+	private int detectedBeacon;
 	private View rootView;
 	private Activity activity;
 	private BeaconDetector[] bDs;
 	private BeaconLocalizer bL;
 	private boolean[] beaconsDetected;
-	private BallFinderTask bFTask;
+	private boolean started;
+	private BallFinderTask2 bFTask;
 
 	public BeaconBallFragment() {
 	}
@@ -107,24 +105,72 @@ public class BeaconBallFragment extends Fragment implements BeaconDetector.Beaco
 
 	@Override
 	public void onBeaconDetected(double x, double y, int beaconNum) {
-		if (!beaconsDetected[beaconNum] && detectedBeacon < 2) {
-			if (detectedBeacon == 1 && !detectStopped) {
+		double angle1 = Math.atan2(x, y);
+		Log.d("bla1", "" + angle1);
+		if (started && !beaconsDetected[beaconNum] && detectedBeacon < 2) {
+			if (detectedBeacon == 1 && !detectStopped && !RobotMovementManager.getInstance().isInterrupted()) {
+				Log.d("BeaconLocal", "2nd beacon detect start stopping!");
 				RobotMovementManager.getInstance().interruptRequest();
 			} else if (detectedBeacon == 1 && detectStopped) {
+				/*if(RobotMovementManager.getInstance().isWorking()) {
+					Log.d("blabla", "still working...");
+					return;
+				}
+				double angle = Math.atan2(x,y);
+				Log.d("bla", "" + angle);
+				if(angle < Math.toRadians(-5)) {
+					RobotMovementManager.getInstance().addCommand(new RobotMovementManager.Command(RobotMovementManager.Commands.PIVOT, 0, Math.toRadians(50)));
+					return;
+				} else if(angle > Math.toRadians(5)) {
+					RobotMovementManager.getInstance().addCommand(new RobotMovementManager.Command(RobotMovementManager.Commands.PIVOT, 0, Math.toRadians(-50)));
+					return;
+				}*/
+				Log.d("BeaconLocal", "2nd beacon detected start calibrating!");
 				bL.setBeacon(beaconNum, new org.uibk.iis.robotprojectapp.Point(x, y));
 				detectedBeacon++;
 				beaconsDetected[beaconNum] = true;
 			} else if (!beaconsDetected[beaconNum]) {
+				Log.d("BeaconLocal", "1st beacon detected start calibrating!");
 				bL.setBeacon(beaconNum, new org.uibk.iis.robotprojectapp.Point(x, y));
 				detectedBeacon++;
+				beaconsDetected[beaconNum] = true;
 			}
 
 		}
 	}
 
 	@Override
-	public void onLocalized(org.uibk.iis.robotprojectapp.Point p, double angle) {
+	public void onFinishedExecution() {
+		//dirty
+		if (!detectStopped) {
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			detectStopped = true;
+		}
+		if (transportingBall) {
+			bFTask.armUp();
+			transportingBall = false;
+			reset();
+			buttonStart_onClick(null);
+		}
+	}
 
+	@Override
+	public void onLocalized(org.uibk.iis.robotprojectapp.Point p, final double angle) {
+		final org.uibk.iis.robotprojectapp.Point pt = new org.uibk.iis.robotprojectapp.Point(p.x, p.y);
+		Log.d("BeaconLocal", "the calculated Position is: " + pt.x + ", " + pt.y + ", ang: " + angle);
+		OdometryManager.getInstance().updateOdometry(pt.x, pt.y, angle);
+		RobotMovementManager.getInstance().addCommand(new RobotMovementManager.Command(RobotMovementManager.Commands.DRIVE_STRAIGHT_TO, 0, 0, 0, 0));
+		odometryUpdated = true;
+		activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				Toast.makeText(activity, "the calculated Position is: " + pt.x + ", " + pt.y + ", ang: " + Math.toDegrees(angle), Toast.LENGTH_LONG).show();
+			}
+		});
 	}
 
 	@Override
@@ -134,25 +180,26 @@ public class BeaconBallFragment extends Fragment implements BeaconDetector.Beaco
 		this.rootView = rootView;
 		this.ballDetected = false;
 
-		((Button) rootView.findViewById(R.id.robot_beacon_ball_buttonStart)).setOnClickListener(new View.OnClickListener() {
+		rootView.findViewById(R.id.robot_beacon_ball_buttonStart).setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				Log.d("Ballfinder: ", "started the Ball finder!");
 				buttonStart_onClick(v);
 			}
 		});
 
-		((Button) rootView.findViewById(R.id.robot_beacon_ball_buttonReset)).setOnClickListener(new View.OnClickListener() {
+		rootView.findViewById(R.id.robot_beacon_ball_buttonReset).setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				RobotMovementManager.getInstance().interruptRequestBlocking();
+				reset();
 			}
 		});
-		((Button) rootView.findViewById(R.id.robot_beacon_ball_buttonCalibrateHomography)).setOnClickListener(new View.OnClickListener() {
+		rootView.findViewById(R.id.robot_beacon_ball_buttonCalibrateHomography).setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				buttonCalibrateHomography_onClick(v);
 			}
 		});
 
-		((Button) rootView.findViewById(R.id.robot_beacon_ball_buttonCalibrateColors)).setOnClickListener(new View.OnClickListener() {
+		rootView.findViewById(R.id.robot_beacon_ball_buttonCalibrateColors).setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				buttonCalibrateColors_onClick(v);
 			}
@@ -185,6 +232,15 @@ public class BeaconBallFragment extends Fragment implements BeaconDetector.Beaco
 		//mOpenCvCameraView.setMaxFrameSize(1920, 1080);
 		mOpenCvCameraView.enableFpsMeter();
 		return rootView;
+	}
+
+	public void reset() {
+		bL = new BeaconLocalizer(BeaconBallFragment.this);
+		detectStopped = false;
+		detectedBeacon = 0;
+		started = false;
+		for (int i = 0; i < BEACON_COUNT; i++)
+			beaconsDetected[i] = false;
 	}
 
 	public void buttonCalibrateHomography_onClick(View v) {
@@ -234,8 +290,10 @@ public class BeaconBallFragment extends Fragment implements BeaconDetector.Beaco
 		}
 		if (bFTask != null)
 			bFTask.reset();
-		bFTask = new BallFinderTask(x, y, theta, xBall, yBall);
-		bFTask.start();
+		bFTask = new BallFinderTask2(x, y, theta, xBall, yBall);
+		started = true;
+		ballDetected = false;
+		odometryUpdated = false;
 		bFTask.searchBall();
 	}
 
@@ -261,6 +319,7 @@ public class BeaconBallFragment extends Fragment implements BeaconDetector.Beaco
 	}
 
 	public void onCameraViewStarted(int width, int height) {
+		started = false;
 		mRgba = new Mat(height, width, CvType.CV_8UC4);
 		// COLOR_COUNT different colors
 		mDetectors = new ColorBlobDetector[COLOR_COUNT];
@@ -282,15 +341,22 @@ public class BeaconBallFragment extends Fragment implements BeaconDetector.Beaco
 		CONTOUR_COLOR[3] = new Scalar(255, 255, 255, 255);
 		bDs = new BeaconDetector[BEACON_COUNT];
 		bDs[0] = new BeaconDetector(0, 1, this, 0);
-		bDs[1] = new BeaconDetector(0, 2, this, 1);
+		bDs[1] = new BeaconDetector(1, 2, this, 1);
 		bDs[2] = new BeaconDetector(2, 1, this, 2);
-		bDs[3] = new BeaconDetector(1, 2, this, 3);
-		bDs[4] = new BeaconDetector(2, 0, this, 4);
-		bDs[5] = new BeaconDetector(1, 0, this, 5);
+		bDs[3] = new BeaconDetector(1, 0, this, 3);
+//		bDs[0] = new BeaconDetector(0, 1, this, 0);
+//		bDs[1] = new BeaconDetector(2, 3, this, 1);
+//		bDs[2] = new BeaconDetector(0, 2, this, 2);
+//		bDs[3] = new BeaconDetector(2, 1, this, 3);
+//		bDs[4] = new BeaconDetector(1, 0, this, 4);
+//		bDs[5] = new BeaconDetector(3, 2, this, 5);
+//		bDs[6] = new BeaconDetector(2, 0, this, 6);
+//		bDs[7] = new BeaconDetector(1, 3, this, 7);
 		bL = new BeaconLocalizer(this);
 		beaconsDetected = new boolean[BEACON_COUNT];
 		for (int i = 0; i < BEACON_COUNT; i++)
 			beaconsDetected[i] = false;
+		RobotMovementManager.getInstance().registerListener(this);
 	}
 
 	public void onCameraViewStopped() {
@@ -367,6 +433,21 @@ public class BeaconBallFragment extends Fragment implements BeaconDetector.Beaco
 			List<BeaconDetector.WorldObject>[] woList = BeaconDetector.calculateWorldObjects(contours, this, mRgba.width(), mRgba.height());
 			for (int i = 0; i < BEACON_COUNT; i++)
 				bDs[i].detectBeacon(woList);
+			if (odometryUpdated && false) {
+				for (BeaconDetector.WorldObject wo : woList[BALL_COLOR]) {
+					double radiusCalculated = wo.worldPos.length() * 2.0 * Math.tan(BeaconDetector.CAMERA_FIELD_OF_VIEW / 2) * wo.iR * 0.5;
+					if (!ballDetected) {
+						if (radiusCalculated <= BallFinderTask2.BALL_RADIUS * 1.4 && radiusCalculated >= BallFinderTask2.BALL_RADIUS * 0.7) {
+							ballDetected = true;
+							bFTask.ballDetected(wo);
+						}
+					}
+					if ((wo.worldPos.length() < 17 && radiusCalculated <= BallFinderTask2.BALL_RADIUS * 1.4 && radiusCalculated >= BallFinderTask2.BALL_RADIUS * 0.7)) {
+						bFTask.ballNearEnough(wo);
+						transportingBall = true;
+					}
+				}
+			}
 			for (int i = 0; i < COLOR_COUNT; i++) {
 				Mat colorLabel = mRgba.submat(4 + 24 * i, (i + 1) * 24, 4, 24);
 				colorLabel.setTo(mBlobColorRgba[i]);

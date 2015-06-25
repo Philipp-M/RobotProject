@@ -14,9 +14,9 @@ import java.util.Map;
 public class BeaconDetector {
 
 	//	private static final double CAMERA_FIELD_OF_VIEW = 1.0155659339644644474;
-	private static final double CAMERA_FIELD_OF_VIEW = 1.15055659339644644474;
+	public static final double CAMERA_FIELD_OF_VIEW = 1.15055659339644644474;
 	private static final double BEACON_COLOR_HEIGHT = 10;
-	private static final double VERTICAL_THRESHOLD = 2;
+	private static final double VERTICAL_THRESHOLD = 3;
 
 	public interface BeaconDetectorListener {
 		void onBeaconDetected(double x, double y, int beaconNum);
@@ -47,7 +47,7 @@ public class BeaconDetector {
 				double disToU = woU.worldPos.length();
 				double radiusCalculated = disToL * 2.0 * Math.tan(CAMERA_FIELD_OF_VIEW / 2) * woL.iR * 0.5;
 //				double radiusCalculated = disToL * Math.tan(CAMERA_FIELD_OF_VIEW * woL.iR/2);
-				Log.d("Homography", "radius: " + radiusCalculated);
+				//Log.d("Homography", "radius: " + radiusCalculated);
 				if (disToL < disToU && radiusCalculated < 0.5 * 1.5 * BEACON_COLOR_HEIGHT && radiusCalculated > 0.5 * 0.75 * BEACON_COLOR_HEIGHT) {
 					//double dis = disToL * Math.tan(CAMERA_FIELD_OF_VIEW * getDistanceTo(woL.iC, woU.iC) / 2);
 					double disX = disToL * 2.0 * Math.tan(CAMERA_FIELD_OF_VIEW / 2.0) * Math.abs(woL.iC.x - woU.iC.x) * 0.5;

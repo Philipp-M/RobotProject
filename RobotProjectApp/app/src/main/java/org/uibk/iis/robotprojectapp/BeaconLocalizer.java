@@ -1,6 +1,8 @@
 package org.uibk.iis.robotprojectapp;
 
 
+import android.util.Log;
+
 public class BeaconLocalizer {
 	public interface BeaconLocalizerListener {
 		void onLocalized(Point p, double angle);
@@ -23,16 +25,31 @@ public class BeaconLocalizer {
 		beaconNum1 = -1;
 		beaconNum2 = -1;
 		beaconAngle = 0;
-		beacons = new Point[6];
+		beacons = new Point[8];
 		beacons[0] = new Point(-125, 125);
-		beacons[1] = new Point(0, 125);
-		beacons[2] = new Point(125, 125);
-		beacons[3] = new Point(125, -125);
-		beacons[4] = new Point(0, -125);
-		beacons[5] = new Point(-125, -125);
+//		beacons[0] = new Point(-90, -45);
+		beacons[1] = new Point(125, 125);
+		beacons[2] = new Point(125, -125);
+		beacons[3] = new Point(-125, -125);
+//		beacons[3] = new Point(125, 0);
+//		beacons[4] = new Point(125, -125);
+//		beacons[5] = new Point(0, -125);
+//		beacons[6] = new Point(-125, -125);
+//		beacons[7] = new Point(-125, 0);
+//		beacons[0] = new Point(-125, 125);
+////		beacons[0] = new Point(-90, -45);
+//		beacons[1] = new Point(0, 125);
+//		beacons[2] = new Point(125, 125);
+//		beacons[3] = new Point(125, 0);
+//		beacons[4] = new Point(125, -125);
+//		beacons[5] = new Point(0, -125);
+//		beacons[6] = new Point(-125, -125);
+//		beacons[7] = new Point(-125, 0);
+////		beacons[5] = new Point(-90, 45);
 	}
 
 	public void setBeacon(int num, Point pos) {
+		Log.d("BeaconLocal", "beaconLocalization: beaconPos: " + pos.x + ", " + pos.y);
 		if (beaconNum1 == -1) {
 			beaconNum1 = num;
 			beaconToDetect1 = pos;
@@ -54,7 +71,8 @@ public class BeaconLocalizer {
 			}
 			double deltaAngle = Math.asin(beaconToDetect2.x / beaconToDetect2.length());
 			double absLength = resultingPosition.distanceTo(beacons[beaconNum2]);
-			double beaconAngle = Math.asin((resultingPosition.x - beacons[beaconNum2].x) / absLength);
+			double beaconAngle = Math.atan2(beacons[beaconNum2].y - resultingPosition.y, beacons[beaconNum2].x - resultingPosition.x);
+//			double beaconAngle = Math.asin((resultingPosition.x - beacons[beaconNum2].x) / absLength);
 			double angle = beaconAngle - deltaAngle;
 
 			finished = true;

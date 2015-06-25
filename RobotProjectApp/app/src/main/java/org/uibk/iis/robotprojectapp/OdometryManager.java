@@ -29,6 +29,9 @@ public class OdometryManager {
 	public void resetPosition() {
 		this.pos = new Position(0, 0, 0);
 	}
+	public void updateOdometry(double x, double y, double angle) {
+		this.pos = new Position(x,y,angle);
+	}
 
 	public synchronized boolean pivotAngleNonStopping(double theta, CalibrationTask.Type speed) {
 		int robotSpeed;

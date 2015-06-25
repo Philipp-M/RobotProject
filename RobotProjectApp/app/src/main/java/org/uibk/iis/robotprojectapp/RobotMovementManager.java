@@ -95,7 +95,7 @@ public class RobotMovementManager {
 		}
 	}
 	public boolean isWorking() {
-		return isFinished;
+		return !isFinished;
 	}
 	/**
 	 * registers the given listener
@@ -103,7 +103,9 @@ public class RobotMovementManager {
 	 * @param changeEventListener
 	 */
 	public void registerListener(ChangeEventListener changeEventListener) {
-		changeEventListeners.add(changeEventListener);
+		synchronized (changeEventListeners) {
+			changeEventListeners.add(changeEventListener);
+		}
 	}
 
 	/**
@@ -112,9 +114,11 @@ public class RobotMovementManager {
 	 * @param changeEventListener
 	 */
 	public void unregisterListener(ChangeEventListener changeEventListener) {
-		for (ChangeEventListener cEL : changeEventListeners) {
-			if (cEL == changeEventListener)
-				changeEventListeners.remove(cEL);
+		synchronized (changeEventListeners) {
+			for (ChangeEventListener cEL : changeEventListeners) {
+				if (cEL == changeEventListener)
+					changeEventListeners.remove(cEL);
+			}
 		}
 	}
 
@@ -141,7 +145,8 @@ public class RobotMovementManager {
 		interruptRequest();
 		try {
 			synchronized (commandQueue) {
-				commandQueue.wait();
+				if(!isFinished)
+					commandQueue.wait();
 			}
 		} catch (InterruptedException e) {
 		}
@@ -154,6 +159,7 @@ public class RobotMovementManager {
 	 */
 	public synchronized void addCommand(Command command) {
 		commandQueue.add(command);
+		isFinished = false;
 	}
 
 	/**
@@ -174,45 +180,56 @@ public class RobotMovementManager {
 					Thread.sleep(5);
 					synchronized (RobotMovementManager.getInstance()) {
 						if (isInterrupted() && currentCommand == null) {
-							interruptRequest = false;
-							isFinished = true;
 							synchronized (commandQueue) {
+								interruptRequest = false;
+								isFinished = true;
 								commandQueue.notifyAll();
 							}
-							for (ChangeEventListener cEL : changeEventListeners)
-								cEL.onFinishedExecution();
+							synchronized (changeEventListeners) {
+								for (ChangeEventListener cEL : changeEventListeners)
+									cEL.onFinishedExecution();
+							}
 						} else if (isInterrupted() && currentCommand != null) {
 							currentCommand.interrupt();
 							currentCommand.join();
 							OdometryManager.getInstance().stop();
-							interruptRequest = false;
 							currentCommand = null;
 							commandQueue.clear();
-							isFinished = true;
 							synchronized (commandQueue) {
+								interruptRequest = false;
+								isFinished = true;
 								commandQueue.notifyAll();
 							}
-							for (ChangeEventListener cEL : changeEventListeners)
-								cEL.onFinishedExecution();
+							synchronized (changeEventListeners) {
+								for (ChangeEventListener cEL : changeEventListeners)
+									cEL.onFinishedExecution();
+							}
 						} else if (currentCommand == null && !commandQueue.isEmpty()) {
 							currentCommand = new Thread(commandQueue.remove());
 							currentCommand.start();
-							isFinished = false;
+							synchronized (commandQueue) {
+								isFinished = false;
+							}
 						} else if (currentCommand != null && !currentCommand.isAlive()) {
 							currentCommand.join();
 
 							if (commandQueue.isEmpty()) {
 								currentCommand = null;
 								synchronized (commandQueue) {
+									interruptRequest = false;
+									isFinished = true;
 									commandQueue.notifyAll();
 								}
-								isFinished = true;
-								for (ChangeEventListener cEL : changeEventListeners)
-									cEL.onFinishedExecution();
+								synchronized (changeEventListeners) {
+									for (ChangeEventListener cEL : changeEventListeners)
+										cEL.onFinishedExecution();
+								}
 							} else {
 								currentCommand = new Thread(commandQueue.remove());
 								currentCommand.start();
-								isFinished = false;
+								synchronized (commandQueue) {
+									isFinished = false;
+								}
 							}
 						}
 					}
